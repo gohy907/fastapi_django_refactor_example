@@ -1,5 +1,7 @@
 from typing import Optional
-from pydantic import BaseModel, datetime
+from pydantic import BaseModel
+
+from datetime import datetime
 
 from schemas.users import User
 from schemas.categories import Category

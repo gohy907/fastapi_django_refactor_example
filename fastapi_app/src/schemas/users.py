@@ -1,4 +1,5 @@
-from pydantic import BaseModel, SecretStr, datetime
+from pydantic import BaseModel, SecretStr
+from datetime import datetime
 from typing import Optional
 
 
