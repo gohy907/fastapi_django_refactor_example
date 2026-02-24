@@ -8,6 +8,11 @@ class PostRequestSchema(BaseModel):
     text: str = Field(max_length=80)
 
 
+class Post(BaseModel):
+    author: User
+    text: str = Field(max_length=80)
+
+
 class PostResponseSchema(BaseModel):
     post_text: str
     author_name: str
