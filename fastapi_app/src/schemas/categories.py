@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+import uuid
 
-from schemas.users import User
+from pydantic import BaseModel, Field
+from datetime import datetime
 
 
 class CategoryBase(BaseModel):
@@ -11,18 +11,17 @@ class CategoryBase(BaseModel):
 
 
 class CategoryCreate(CategoryBase):
-    author_id: int
+    author_id: uuid.UUID
 
 
 class CategoryUpdate(BaseModel):
-    title: Optional[str] = Field(max_length=256)
-    description: Optional[str]
-    is_published: Optional[bool]
+    title: str | None = None
+    description: str | None = None
 
 
 class Category(BaseModel):
-    id: int
-    author: User
+    id: uuid.UUID
+    author_id: uuid.UUID
     title: str = Field(max_length=256)
     description: str
-    is_published: bool
+    created_at: datetime

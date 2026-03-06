@@ -1,9 +1,7 @@
+import uuid
+
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
-
-
-from schemas.users import User
 
 
 class LocationBase(BaseModel):
@@ -13,18 +11,18 @@ class LocationBase(BaseModel):
 
 
 class LocationCreate(LocationBase):
-    author_id: int
+    author_id: uuid.UUID
 
 
 class LocationUpdate(BaseModel):
-    title: Optional[str] = Field(max_length=256)
-    description: Optional[str]
-    is_published: Optional[bool]
+    title: str | None = None
+    description: str | None = None
+    is_published: bool | None = None
 
 
 class Location(BaseModel):
-    id: int
-    author: User
+    id: uuid.UUID
+    author_id: uuid.UUID
     title: str = Field(max_length=256)
     description: str
     is_published: bool

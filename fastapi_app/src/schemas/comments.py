@@ -1,10 +1,7 @@
+import uuid
+
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
-
-
-from schemas.posts import Post
-from schemas.users import User
 
 
 class CommentBase(BaseModel):
@@ -12,16 +9,16 @@ class CommentBase(BaseModel):
 
 
 class CommentCreate(CommentBase):
-    author_id: int
-    post_id: int
+    author_id: uuid.UUID
+    post_id: uuid.UUID
 
 
 class CommentUpdate(BaseModel):
-    text: Optional[str]
+    text: str | None = None
 
 
 class Comment(BaseModel):
-    author: User
-    post: Post
+    author_id: uuid.UUID
+    post_id: uuid.UUID
     text: str
     created_at: datetime
