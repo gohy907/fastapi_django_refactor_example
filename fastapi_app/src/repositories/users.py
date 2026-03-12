@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional
 
 from sqlalchemy import or_, select
@@ -21,8 +22,14 @@ class UserRepository(BaseRepository[User]):
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
 
-    async def is_user_exists(self, login: str) -> bool:
+    async def does_user_exist_by_login(self, login: str) -> bool:
         query = select(User).where(
             User.login == login)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none() is not None
+
+    async def does_user_exist_by_id(self, id: uuid.UUID) -> bool:
+        query = select(User).where(
+            User.id == id)
         result = await self.session.execute(query)
         return result.scalar_one_or_none() is not None

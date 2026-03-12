@@ -19,7 +19,7 @@ class CategoryUpdate(BaseModel):
     description: str | None = None
 
 
-class Category(BaseModel):
+class CategoryResponse(BaseModel):
     id: uuid.UUID
     author_id: uuid.UUID
     title: str = Field(max_length=256)
