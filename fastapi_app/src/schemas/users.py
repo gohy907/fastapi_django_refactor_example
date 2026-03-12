@@ -1,5 +1,21 @@
-from pydantic import BaseModel, SecretStr, ConfigDict
+import uuid
+from pydantic import BaseModel, SecretStr
+from datetime import datetime
 
 
-class User(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class UserBase(BaseModel):
+    login: str
+
+
+class UserCreate(UserBase):
+    password: SecretStr
+
+
+class UserUpdate(BaseModel):
+    login: str | None = None
+    password: str | None = None
+
+
+class UserResponse(UserBase):
+    id: uuid.UUID
+    created_at: datetime
