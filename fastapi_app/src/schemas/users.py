@@ -1,5 +1,5 @@
 import uuid
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, ConfigDict
 from datetime import datetime
 
 
@@ -19,3 +19,4 @@ class UserUpdate(BaseModel):
 class UserResponse(UserBase):
     id: uuid.UUID
     created_at: datetime
+    model_config = ConfigDict(from_attributes=True)

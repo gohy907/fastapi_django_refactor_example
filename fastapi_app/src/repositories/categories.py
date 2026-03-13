@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from sqlalchemy import or_, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.categories import Category
@@ -9,6 +9,7 @@ from repositories.base import BaseRepository
 
 
 class CategoryRepository(BaseRepository[Category]):
+
     def __init__(self, session: AsyncSession):
         super().__init__(Category, session)
 
