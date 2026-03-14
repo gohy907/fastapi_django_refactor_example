@@ -1,7 +1,7 @@
 services:
   postgres:
-    image: postgres:18.1
-    container_name: fastapi_pg
+    image: postgres:latest
+    container_name: postgres
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
