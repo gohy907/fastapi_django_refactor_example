@@ -1,57 +1,69 @@
-use axum::{
-    Router,
-    body::Bytes,
-    extract::{Extension, Json, Path, Query, Request},
-    http::header::HeaderMap,
-    routing::post,
-};
-use serde_json::Value;
-use std::collections::HashMap;
+mod domain;
+mod handlers;
+mod models;
+mod repositories;
+mod schemas;
+mod storages;
 
-// `Path` gives you the path parameters and deserializes them. See its docs for
-// more details
-async fn path(Path(user_id): Path<u32>) {}
+use crate::repositories::users::UserRepository;
+use crate::storages::users::UserStorage;
+use axum::Router;
+use dotenvy::dotenv;
+use handlers::users::{UserRouter, UsersDocs};
+use schemas::users::{UserCreate, UserResponse};
+use sqlx::postgres::PgPoolOptions;
+use std::env;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
-// `Query` gives you the query parameters and deserializes them.
-async fn query(Query(params): Query<HashMap<String, String>>) {}
+#[derive(OpenApi)]
+#[openapi(info(title = "Blazingly-fast API!!!", version = "1.0.0"))]
+struct ApiDoc;
 
-// `HeaderMap` gives you all the headers
-async fn headers(headers: HeaderMap) {}
-
-// `String` consumes the request body and ensures it is valid utf-8
-async fn string(body: String) {
-    println!("{}", body);
-}
-
-// `Bytes` gives you the raw request body
-async fn bytes(body: Bytes) {}
-
-// We've already seen `Json` for parsing the request body as json
-async fn json(Json(payload): Json<Value>) {}
-
-// `Request` gives you the whole request for maximum control
-async fn request(request: Request) {}
-
-// `Extension` extracts data from "request extensions"
-// This is commonly used to share state with handlers
-async fn extension(Extension(state): Extension<State>) {}
+use crate::domain::use_cases::users::create_user::RegisterUseCase;
+use std::sync::Arc;
 
 #[derive(Clone)]
-struct State {/* ... */}
+pub struct AppState {
+    pub register_use_case: Arc<RegisterUseCase>,
+}
 
 #[tokio::main]
 async fn main() {
-    // build our application with a single route
-    let app = Router::new()
-        .route("/path/{user_id}", post(path))
-        .route("/query", post(query))
-        .route("/string", post(string))
-        .route("/bytes", post(bytes))
-        .route("/json", post(json))
-        .route("/request", post(request))
-        .route("/extension", post(extension));
+    dotenv().ok();
 
-    // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env file");
+
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&database_url)
+        .await
+        .expect("Не удалось подключиться к базе данных");
+
+    println!("Успешное подключение к PostgreSQL!");
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .expect("Failed to run database migrations");
+
+    let user_repo = UserRepository { pool };
+    let user_storage: Arc<dyn UserStorage> = Arc::new(user_repo);
+    let open_api = ApiDoc::openapi().nest("/users", UsersDocs::openapi());
+    let swagger_router = SwaggerUi::new("/docs").url("/api-docs/openapi.json", open_api);
+
+    let register_use_case = Arc::new(RegisterUseCase::new(user_storage));
+    let state = AppState { register_use_case };
+    let base_router = Router::new()
+        .nest("/users", UserRouter::new())
+        .merge(swagger_router)
+        .with_state(state);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
+
+    println!("Сервер запущен: http://localhost:3000/docs/");
+    axum::serve(listener, base_router.into_make_service())
+        .await
+        .unwrap();
 }
