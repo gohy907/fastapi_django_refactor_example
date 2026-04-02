@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, AsyncIterator, Dict
 
 from fastapi import HTTPException
-from sqlalchemy import JSON, Boolean, DateTime, MetaData, String
+from sqlalchemy import JSON, Boolean, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import PendingRollbackError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -41,11 +41,9 @@ class PostgresDatabase:
 
 
 database = PostgresDatabase()
-# metadata = MetaData(schema=settings.POSTGRES_SCHEMA)
 
 
 class Base(DeclarativeBase):
-    # metadata = metadata
     type_annotation_map = {
         str: String().with_variant(String(255), "postgresql"),
         uuid.UUID: UUID(as_uuid=True),
