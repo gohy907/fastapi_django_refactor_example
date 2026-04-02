@@ -1,6 +1,6 @@
 import uuid
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
 
@@ -25,3 +25,4 @@ class CategoryResponse(BaseModel):
     title: str = Field(max_length=256)
     description: str
     created_at: datetime
+    model_config = ConfigDict(from_attributes=True)

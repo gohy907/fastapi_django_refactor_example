@@ -1,6 +1,5 @@
 from repositories.users import UserRepository
 from schemas.users import UserResponse, UserCreate
-from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
