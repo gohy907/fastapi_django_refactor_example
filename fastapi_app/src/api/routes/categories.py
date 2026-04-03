@@ -10,7 +10,7 @@ from api.routes.depends import create_category_use_case, get_category_by_id_use_
 
 
 from domain.categories.use_cases.create_category import CreateCategoryUseCase
-from domain.categories.use_cases.get_category_by_id import GetCategoryByIdUseCase
+from domain.categories.use_cases.get_category import GetCategoryByIdUseCase, GetCategoryByTitleUseCase
 router = APIRouter()
 
 

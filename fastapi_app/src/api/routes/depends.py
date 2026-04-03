@@ -1,7 +1,7 @@
 from domain.users.use_cases.create_user import CreateUserUseCase
 from domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
 from domain.categories.use_cases.create_category import CreateCategoryUseCase
-from domain.categories.use_cases.get_category_by_id import GetCategoryByIdUseCase
+from domain.categories.use_cases.get_category import GetCategoryByIdUseCase
 
 
 def create_user_use_case() -> CreateUserUseCase:

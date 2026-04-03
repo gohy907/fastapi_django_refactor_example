@@ -21,3 +21,18 @@ class GetCategoryByIdUseCase:
             raise HTTPException(status_code=404, detail="Category not found")
 
         return CategoryResponse.model_validate(category)
+
+
+class GetCategoryByTitleUseCase:
+    def __init__(self):
+        pass
+
+    async def execute(self, session: AsyncSession, title: str) -> CategoryResponse:
+        repo = CategoryRepository(session)
+
+        category = await repo.get_by_title(title)
+
+        if not category:
+            raise HTTPException(status_code=404, detail="Category not found")
+
+        return CategoryResponse.model_validate(category)
