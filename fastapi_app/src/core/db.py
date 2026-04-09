@@ -6,13 +6,13 @@ from typing import Any, AsyncIterator, Dict
 from fastapi import HTTPException
 from sqlalchemy import JSON, Boolean, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.exc import PendingRollbackError
+from sqlalchemy.exc import PendingRollbackError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from core.config import settings
-from core.exceptions import DatabaseError
-
+from core.exceptions import DatabaseError, BaseException 
+from fastapi.exceptions import RequestValidationError
 
 class PostgresDatabase:
     def __init__(self) -> None:
@@ -31,17 +31,16 @@ class PostgresDatabase:
             try:
                 yield session
                 await session.commit()
-            except HTTPException:
-                raise
-            except (Exception, PendingRollbackError) as error:
+            except (HTTPException, RequestValidationError, BaseException, IntegrityError):
+                await session.rollback()
+                raise 
+            except Exception as error:
                 await session.rollback()
                 raise DatabaseError(message=repr(error))
             finally:
                 await session.close()
 
-
 database = PostgresDatabase()
-
 
 class Base(DeclarativeBase):
     type_annotation_map = {
