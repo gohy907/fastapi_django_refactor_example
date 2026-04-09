@@ -14,10 +14,8 @@ class UserRepository(BaseRepository[User]):
 
     async def create(self, data: dict) -> User:
         try:
-            # Вызываем метод базового репозитория
             return await super().create(data)
         except IntegrityError:
-            # Если база вернула ошибку уникальности (UniqueConstraint)
             raise UserAlreadyExistsError()
 
     async def does_user_exist_by_login(self, login: str) -> bool:

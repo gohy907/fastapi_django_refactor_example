@@ -4,7 +4,8 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 
 from api.routes.users import router as users_router
-from core.exceptions import DatabaseError, UserAlreadyExistsError
+from api.routes.categories import router as categories_router
+from core.exceptions import DatabaseError, UserAlreadyExistsError, CategoryAlreadyExistsError, UserDoesNotExist
 
 
 def create_app() -> FastAPI:
@@ -20,6 +21,26 @@ def create_app() -> FastAPI:
     @app.exception_handler(UserAlreadyExistsError)
     async def user_already_exists_handler(
         request: Request, exc: UserAlreadyExistsError
+    ):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": exc.message},
+        )
+
+
+    @app.exception_handler(UserDoesNotExist)
+    async def user_does_not_exist (
+        request: Request, exc: UserDoesNotExist 
+    ):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": exc.message},
+        )
+
+
+    @app.exception_handler(CategoryAlreadyExistsError)
+    async def category_already_exists_handler(
+        request: Request, exc: CategoryAlreadyExistsError
     ):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -49,5 +70,6 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(users_router, prefix="/users", tags=["User APIs"])
+    app.include_router(categories_router, prefix="/categories", tags=["Category APIs"])
 
     return app

@@ -25,6 +25,26 @@ class UserAlreadyExistsError(BaseException):
         super().__init__(self.message)
 
 
+class CategoryAlreadyExistsError(BaseException):
+    _ERROR_MESSAGE_TEMPLATE: Final[str] = (
+        "Category with such title already exists"
+    )
+
+    def __init__(self) -> None:
+        self.message = self._ERROR_MESSAGE_TEMPLATE
+        super().__init__(self.message)
+
+
+class UserDoesNotExist(BaseException):
+    _ERROR_MESSAGE_TEMPLATE: Final[str] = (
+        "User with such id does not exist"
+    )
+
+    def __init__(self) -> None:
+        self.message = self._ERROR_MESSAGE_TEMPLATE
+        super().__init__(self.message)
+
+
 class DatabaseError(BaseException):
     _ERROR_MESSAGE_TEMPLATE: Final[str] = "Database error: {message}"
 

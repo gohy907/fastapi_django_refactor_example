@@ -14,12 +14,6 @@ class GetCategoryByIdUseCase:
 
     async def execute(self, session: AsyncSession, id: uuid.UUID) -> CategoryResponse:
         repo = CategoryRepository(session)
-
-        category = await repo.get(id)
-
-        if not category:
-            raise HTTPException(status_code=404, detail="Category not found")
-
         return CategoryResponse.model_validate(category)
 
 
@@ -31,8 +25,4 @@ class GetCategoryByTitleUseCase:
         repo = CategoryRepository(session)
 
         category = await repo.get_by_title(title)
-
-        if not category:
-            raise HTTPException(status_code=404, detail="Category not found")
-
         return CategoryResponse.model_validate(category)
