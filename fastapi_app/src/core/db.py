@@ -11,8 +11,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import DeclarativeBase
 
 from core.config import settings
-from core.exceptions import DatabaseError, BaseException 
+from core.exceptions.exc import DatabaseError, BaseException
 from fastapi.exceptions import RequestValidationError
+
 
 class PostgresDatabase:
     def __init__(self) -> None:
@@ -33,14 +34,16 @@ class PostgresDatabase:
                 await session.commit()
             except (HTTPException, RequestValidationError, BaseException, IntegrityError):
                 await session.rollback()
-                raise 
+                raise
             except Exception as error:
                 await session.rollback()
                 raise DatabaseError(message=repr(error))
             finally:
                 await session.close()
 
+
 database = PostgresDatabase()
+
 
 class Base(DeclarativeBase):
     type_annotation_map = {

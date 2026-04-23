@@ -1,21 +1,26 @@
 from repositories.users import UserRepository
-from schemas.users import UserResponse, UserCreate
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from resources.auth import get_password_hash
+from schemas.users import CreateUser, UserInternal, UserResponse
+from core.db import database
+from core.exceptions.database_exceptions import UserAlreadyExistsException
+from core.exceptions.domain_exceptions import UserLoginIsNotUniqueException
 
 
 class CreateUserUseCase:
-
     def __init__(self):
-        pass
+        self._database = database
 
-    async def execute(self, session: AsyncSession, user_in: UserCreate) -> UserResponse:
-        repo = UserRepository(session)
+    async def execute(self, session: AsyncSession, user_in: CreateUser) -> UserResponse:
+        hashed_password = get_password_hash(password=user_in.password)
+        user_in.password = hashed_password
+        repo = UserRepository()
 
-        user_data = user_in.model_dump()
-        user_data["password_hash"] = user_in.password.get_secret_value()
-        del user_data["password"]
-        user = await repo.create(user_data)
-        await session.commit()
+        try:
+            user = await repo.create(session=session, user=user_in)
 
-        return UserResponse.model_validate(user)
+            await session.commit()
+            return UserResponse.model_validate(user)
+        except UserAlreadyExistsException:
+            raise UserLoginIsNotUniqueException(login=user_in.login)

@@ -1,32 +1,33 @@
-import uuid
-from pydantic import BaseModel, SecretStr, ConfigDict, field_validator
+from uuid import UUID
 from datetime import datetime
+from pydantic import BaseModel, ConfigDict, field_validator
+from fastapi import HTTPException, status
 
-import re
 
 class UserBase(BaseModel):
     login: str
 
 
-class UserCreate(UserBase):
-    password: SecretStr
-    @field_validator("password", mode="after")
+class CreateUser(UserBase):
+    password: str
+
+    @field_validator("login")
     @classmethod
-    def password_complexity(cls, v: SecretStr):
-        password = v.get_secret_value()
-        if not re.search(r"\d", password):
-            raise ValueError("Password must contain at least one digit.")
-        if not re.search(r"[a-zA-Z]", password):
-            raise ValueError("Password must contain at least one letter.")
-        return v
-
-
-class UserUpdate(BaseModel):
-    login: str | None = None
-    password: str | None = None
+    def check_login(cls, login: str) -> str:
+        if not login.startswith("user_"):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Логин пользователя обязан начинаться с 'user_'"
+            )
+        return login
 
 
 class UserResponse(UserBase):
-    id: uuid.UUID
+    id: UUID
     created_at: datetime
+
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserInternal(UserResponse):
+    password_hash: str
