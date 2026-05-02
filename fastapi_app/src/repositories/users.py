@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from src.schemas.users import CreateUser
+from src.schemas.users import UserCreate
 
 from src.models.users import User as UserModel
 from src.core.exceptions.database_exceptions import UserNotFoundException, UserAlreadyExistsException
@@ -28,7 +28,7 @@ class UserRepository:
 
         return user
 
-    async def create(self, session: AsyncSession, user_create: CreateUser) -> UserModel:
+    async def create(self, session: AsyncSession, user_create: UserCreate) -> UserModel:
 
         user_data = user_create.model_dump(exclude={"password"})
         user_data["password_hash"] = get_password_hash(user_create.password)

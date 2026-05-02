@@ -8,7 +8,7 @@ class UserBase(BaseModel):
     login: str
 
 
-class CreateUser(UserBase):
+class UserCreate(UserBase):
     password: str
 
     @field_validator("login")
@@ -27,7 +27,3 @@ class UserResponse(UserBase):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class UserInternal(UserResponse):
-    password_hash: str
