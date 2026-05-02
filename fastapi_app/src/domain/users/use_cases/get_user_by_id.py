@@ -1,8 +1,8 @@
 import uuid
 
-from repositories.users import UserRepository
+from src.repositories.users import UserRepository
 from fastapi import HTTPException
-from schemas.users import UserResponse
+from src.schemas.users import UserResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

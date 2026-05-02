@@ -1,11 +1,11 @@
 import logging
 
-from core.db import database
-from repositories.users import UserRepository
-from schemas.users import UserResponse as UserSchema
-from resources.auth import verify_password
-from core.exceptions.database_exceptions import UserNotFoundException
-from core.exceptions.domain_exceptions import UserNotFoundByLoginException, WrongPasswordException
+from src.core.db import database
+from src.repositories.users import UserRepository
+from src.schemas.users import UserResponse as UserSchema
+from src.resources.auth import verify_password
+from src.core.exceptions.database_exceptions import UserNotFoundException
+from src.core.exceptions.domain_exceptions import UserNotFoundByLoginException, WrongPasswordException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)

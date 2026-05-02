@@ -1,20 +1,20 @@
 import uuid
 
-from domain.users.use_cases.create_user import CreateUserUseCase
-from domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
-from schemas.users import CreateUser, UserResponse
+from src.domain.users.use_cases.create_user import CreateUserUseCase
+from src.domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
+from src.schemas.users import CreateUser, UserResponse
 from fastapi import APIRouter, Depends,  status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.db import database
+from src.core.db import database
 
-from api.routes.depends import create_user_use_case, get_user_by_id_use_case, get_get_user_by_login_use_case
-from repositories.users import UserRepository
+from src.api.routes.depends import create_user_use_case, get_user_by_id_use_case, get_get_user_by_login_use_case
+from src.repositories.users import UserRepository
 
 
-from domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
-from core.exceptions.domain_exceptions import UserNotFoundByLoginException, UserLoginIsNotUniqueException
-from services.auth import AuthService
+from src.domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
+from src.core.exceptions.domain_exceptions import UserNotFoundByLoginException, UserLoginIsNotUniqueException
+from src.services.auth import AuthService
 
 router = APIRouter()
 

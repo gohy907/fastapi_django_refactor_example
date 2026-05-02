@@ -10,8 +10,8 @@ from sqlalchemy.exc import PendingRollbackError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-from core.config import settings
-from core.exceptions.exc import DatabaseError, BaseException
+from src.core.config import settings
+from src.core.exceptions.exc import DatabaseError, BaseException
 from fastapi.exceptions import RequestValidationError
 
 

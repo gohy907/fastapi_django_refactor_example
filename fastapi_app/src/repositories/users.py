@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from schemas.users import CreateUser, UserInternal
+from src.schemas.users import CreateUser, UserInternal
 
-from models.users import User as UserModel
-from core.exceptions.database_exceptions import UserNotFoundException, UserAlreadyExistsException
+from src.models.users import User as UserModel
+from src.core.exceptions.database_exceptions import UserNotFoundException, UserAlreadyExistsException
 
 from typing import Type
 

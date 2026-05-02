@@ -1,11 +1,11 @@
-from repositories.users import UserRepository
+from src.repositories.users import UserRepository
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from resources.auth import get_password_hash
-from schemas.users import CreateUser, UserInternal, UserResponse
-from core.db import database
-from core.exceptions.database_exceptions import UserAlreadyExistsException
-from core.exceptions.domain_exceptions import UserLoginIsNotUniqueException
+from src.resources.auth import get_password_hash
+from src.schemas.users import CreateUser, UserInternal, UserResponse
+from src.core.db import database
+from src.core.exceptions.database_exceptions import UserAlreadyExistsException
+from src.core.exceptions.domain_exceptions import UserLoginIsNotUniqueException
 
 
 class CreateUserUseCase:

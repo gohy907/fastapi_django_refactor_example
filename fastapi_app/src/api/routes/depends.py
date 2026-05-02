@@ -1,10 +1,10 @@
-from domain.users.use_cases.create_user import CreateUserUseCase
-from domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
-from domain.categories.use_cases.create_category import CreateCategoryUseCase
-from domain.categories.use_cases.get_category import GetCategoryByIdUseCase
-from domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
-from domain.auth.use_cases.authenticate_user import AuthenticateUserUseCase
-from domain.auth.use_cases.create_access_token import CreateAccessTokenUseCase
+from src.domain.users.use_cases.create_user import CreateUserUseCase
+from src.domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
+from src.domain.categories.use_cases.create_category import CreateCategoryUseCase
+from src.domain.categories.use_cases.get_category import GetCategoryByIdUseCase
+from src.domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
+from src.domain.auth.use_cases.authenticate_user import AuthenticateUserUseCase
+from src.domain.auth.use_cases.create_access_token import CreateAccessTokenUseCase
 
 
 def create_user_use_case() -> CreateUserUseCase:

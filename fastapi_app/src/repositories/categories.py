@@ -3,11 +3,11 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.categories import Category
-from repositories.base import BaseRepository
+from src.models.categories import Category
+from src.repositories.base import BaseRepository
 
 from sqlalchemy.exc import IntegrityError
-from core.exceptions.exc import CategoryAlreadyExistsError, UserDoesNotExist
+from src.core.exceptions.exc import CategoryAlreadyExistsError, UserDoesNotExist
 
 
 class CategoryRepository(BaseRepository[Category]):

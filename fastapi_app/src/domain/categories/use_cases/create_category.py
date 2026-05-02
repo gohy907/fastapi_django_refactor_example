@@ -1,11 +1,11 @@
 from fastapi import HTTPException, status
-from repositories.categories import CategoryRepository
-from schemas.categories import CategoryResponse, CategoryCreate
+from src.repositories.categories import CategoryRepository
+from src.schemas.categories import CategoryResponse, CategoryCreate
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
-from domain.categories.use_cases.get_category import GetCategoryByTitleUseCase
+from src.domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
+from src.domain.categories.use_cases.get_category import GetCategoryByTitleUseCase
 
 
 class CreateCategoryUseCase:

@@ -3,10 +3,10 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 
-from api.routes.users import router as users_router
-from api.routes.categories import router as categories_router
-from core.exceptions.exc import DatabaseError, UserAlreadyExistsError, CategoryAlreadyExistsError, UserDoesNotExist
-from api.auth import router as auth_router
+from src.api.routes.users import router as users_router
+from src.api.routes.categories import router as categories_router
+from src.core.exceptions.exc import DatabaseError, UserAlreadyExistsError, CategoryAlreadyExistsError, UserDoesNotExist
+from src.api.auth import router as auth_router
 
 
 def create_app() -> FastAPI:

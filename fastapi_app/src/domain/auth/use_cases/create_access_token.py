@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 from jose import jwt
 
-from services.auth import SECRET_AUTH_KEY, AUTH_ALGORITHM
+from src.services.auth import SECRET_AUTH_KEY, AUTH_ALGORITHM
 
 
 class CreateAccessTokenUseCase:

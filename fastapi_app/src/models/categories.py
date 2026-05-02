@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from core.db import Base
+from src.core.db import Base
 
 
 class Category(Base):

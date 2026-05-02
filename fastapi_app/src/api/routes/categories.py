@@ -3,14 +3,14 @@ import uuid
 from fastapi import APIRouter, Depends,  status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas.categories import CategoryCreate, CategoryResponse
-from core.db import database
+from src.schemas.categories import CategoryCreate, CategoryResponse
+from src.core.db import database
 
-from api.routes.depends import create_category_use_case, get_category_by_id_use_case
+from src.api.routes.depends import create_category_use_case, get_category_by_id_use_case
 
 
-from domain.categories.use_cases.create_category import CreateCategoryUseCase
-from domain.categories.use_cases.get_category import GetCategoryByIdUseCase, GetCategoryByTitleUseCase
+from src.domain.categories.use_cases.create_category import CreateCategoryUseCase
+from src.domain.categories.use_cases.get_category import GetCategoryByIdUseCase, GetCategoryByTitleUseCase
 router = APIRouter()
 
 

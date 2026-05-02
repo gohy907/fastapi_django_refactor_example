@@ -1,12 +1,12 @@
-from core.db import database
+from src.core.db import database
 from typing import Annotated
 from fastapi import APIRouter, status, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from schemas.auth import Token
-from domain.auth.use_cases.authenticate_user import AuthenticateUserUseCase
-from domain.auth.use_cases.create_access_token import CreateAccessTokenUseCase
-from core.exceptions.domain_exceptions import WrongPasswordException, UserNotFoundByLoginException
-from api.routes.depends import create_access_token_use_case, authenticate_user_use_case
+from src.schemas.auth import Token
+from src.domain.auth.use_cases.authenticate_user import AuthenticateUserUseCase
+from src.domain.auth.use_cases.create_access_token import CreateAccessTokenUseCase
+from src.core.exceptions.domain_exceptions import WrongPasswordException, UserNotFoundByLoginException
+from src.api.routes.depends import create_access_token_use_case, authenticate_user_use_case
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

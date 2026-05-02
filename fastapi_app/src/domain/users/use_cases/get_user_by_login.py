@@ -1,10 +1,10 @@
 import logging
 
-from core.db import database
-from repositories.users import UserRepository
-from schemas.users import UserResponse
-from core.exceptions.database_exceptions import UserNotFoundException
-from core.exceptions.domain_exceptions import UserNotFoundByLoginException
+from src.core.db import database
+from src.repositories.users import UserRepository
+from src.schemas.users import UserResponse
+from src.core.exceptions.database_exceptions import UserNotFoundException
+from src.core.exceptions.domain_exceptions import UserNotFoundByLoginException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
