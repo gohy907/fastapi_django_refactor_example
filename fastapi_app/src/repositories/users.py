@@ -9,6 +9,7 @@ from typing import Type
 
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
+from src.resources import get_password_hash
 
 
 class UserRepository:
@@ -27,10 +28,10 @@ class UserRepository:
 
         return user
 
-    async def create(self, session: AsyncSession, user: CreateUser) -> UserModel:
-        user_data = user.model_dump()
-        password = user_data.pop("password")
-        user_data["password_hash"] = password
+    async def create(self, session: AsyncSession, user_create: CreateUser) -> UserModel:
+
+        user_data = user_create.model_dump(exclude={"password"})
+        user_data["password_hash"] = get_password_hash(user_create.password)
 
         query = (
             insert(self._model)

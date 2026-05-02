@@ -13,12 +13,10 @@ class CreateUserUseCase:
         self._database = database
 
     async def execute(self, session: AsyncSession, user_in: CreateUser) -> UserResponse:
-        hashed_password = get_password_hash(password=user_in.password)
-        user_in.password = hashed_password
         repo = UserRepository()
 
         try:
-            user = await repo.create(session=session, user=user_in)
+            user = await repo.create(session=session, user_create=user_in)
 
             await session.commit()
             return UserResponse.model_validate(user)
