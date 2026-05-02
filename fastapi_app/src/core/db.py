@@ -14,6 +14,10 @@ from src.core.config import settings
 from src.core.exceptions.exc import DatabaseError, BaseException
 from fastapi.exceptions import RequestValidationError
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class PostgresDatabase:
     def __init__(self) -> None:
@@ -37,6 +41,8 @@ class PostgresDatabase:
                 raise
             except Exception as error:
                 await session.rollback()
+                logger.critical(f"Database connection failed: {
+                                error}", exc_info=True)
                 raise DatabaseError(message=repr(error))
             finally:
                 await session.close()

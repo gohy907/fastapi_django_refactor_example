@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.db import database
 
 from src.api.routes.depends import create_user_use_case, get_user_by_id_use_case, get_get_user_by_login_use_case
-from src.repositories.users import UserRepository
 
 
 from src.domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
