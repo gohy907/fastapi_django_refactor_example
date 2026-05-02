@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from src.schemas.users import CreateUser, UserInternal
+from src.schemas.users import CreateUser
 
 from src.models.users import User as UserModel
 from src.core.exceptions.database_exceptions import UserNotFoundException, UserAlreadyExistsException
@@ -8,7 +8,6 @@ from src.core.exceptions.database_exceptions import UserNotFoundException, UserA
 from typing import Type
 
 from sqlalchemy import insert, select
-from sqlalchemy.orm import Session
 from src.resources import get_password_hash
 
 
@@ -16,13 +15,14 @@ class UserRepository:
     def __init__(self):
         self._model: Type[UserModel] = UserModel
 
-    def get(self, session: Session, login: str) -> UserInternal | None:
+    async def get(self, session: AsyncSession, login: str) -> UserModel:
         query = (
             select(self._model)
             .where(self._model.login == login)
         )
 
-        user = session.scalar(query)
+        result = await session.execute(query)
+        user = result.scalar_one_or_none()
         if not user:
             raise UserNotFoundException()
 

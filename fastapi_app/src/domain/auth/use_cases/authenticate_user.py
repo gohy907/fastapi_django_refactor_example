@@ -1,6 +1,5 @@
 import logging
 
-from src.core.db import database
 from src.repositories.users import UserRepository
 from src.schemas.users import UserResponse as UserSchema
 from src.resources.auth import verify_password
@@ -25,7 +24,8 @@ class AuthenticateUserUseCase:
         try:
             user = await repo.get(session=session, login=login)
         except UserNotFoundException:
-            error = UserNotFoundByLoginException(session=session, login=login)
+            error = UserNotFoundByLoginException(
+                login=login)
             logger.error(error.get_detail())
             raise error
 
