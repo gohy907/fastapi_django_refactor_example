@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from src.schemas.users import UserCreate
@@ -15,7 +16,7 @@ class UserRepository:
     def __init__(self):
         self._model: Type[UserModel] = UserModel
 
-    async def get(self, session: AsyncSession, login: str) -> UserModel:
+    async def get_by_login(self, session: AsyncSession, login: str) -> UserModel:
         query = (
             select(self._model)
             .where(self._model.login == login)
@@ -26,6 +27,17 @@ class UserRepository:
         if not user:
             raise UserNotFoundException()
 
+        return user
+
+    async def get_by_id(self, session: AsyncSession, id: uuid.UUID) -> UserModel:
+        query = (
+            select(self._model)
+            .where(self._model.id == id)
+        )
+        result = await session.execute(query)
+        user = result.scalar_one_or_none()
+        if not user:
+            raise UserNotFoundException()
         return user
 
     async def create(self, session: AsyncSession, user_create: UserCreate) -> UserModel:

@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from src.core.db import database
 from src.repositories.users import UserRepository
@@ -17,7 +18,7 @@ class GetUserByLoginUseCase:
 
     async def execute(self, session: AsyncSession, login: str, current_user: UserResponse) -> UserResponse:
         try:
-            user = await self._repo.get(session=session, login=login)
+            user = await self._repo.get_by_login(session=session, login=login)
         except UserNotFoundException:
             error = UserNotFoundByLoginException(login=login)
             logger.error(

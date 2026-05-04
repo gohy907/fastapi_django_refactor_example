@@ -1,9 +1,16 @@
+import logging
 import asyncio
 import uvicorn
 
 from src.app import create_app
 
 app = create_app()
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
 
 async def run() -> None:

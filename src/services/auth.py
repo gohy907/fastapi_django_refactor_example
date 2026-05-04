@@ -37,7 +37,7 @@ class AuthService:
 
         try:
             async with _database.session() as session:
-                user = await _repo.get(session=session, login=username)
+                user = await _repo.get_by_login(session=session, login=username)
         except UserNotFoundException:
             raise CredentialsException(detail=AUTH_EXCEPTION_MESSAGE)
 

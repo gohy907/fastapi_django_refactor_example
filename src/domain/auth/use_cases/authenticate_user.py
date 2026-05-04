@@ -22,7 +22,7 @@ class AuthenticateUserUseCase:
     ) -> UserSchema:
         repo = UserRepository()
         try:
-            user = await repo.get(session=session, login=login)
+            user = await repo.get_by_login(session=session, login=login)
         except UserNotFoundException:
             error = UserNotFoundByLoginException(
                 login=login)

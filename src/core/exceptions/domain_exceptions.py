@@ -16,6 +16,16 @@ class UserNotFoundByLoginException(BaseDomainException):
         super().__init__(detail=self._exception_text_template)
 
 
+class UserNotFoundByIdException(BaseDomainException):
+    _exception_text_template = "Пользователь с логином='{id}' не найден"
+
+    def __init__(self, id: id) -> None:
+        self._exception_text_template = self._exception_text_template.format(
+            id=id)
+
+        super().__init__(detail=self._exception_text_template)
+
+
 class UserLoginIsNotUniqueException(BaseDomainException):
     _exception_text_template = "Пользователь с логином='{login}' уже существует"
 

@@ -24,7 +24,7 @@ async def get_db():
 
 
 @router.get(
-    "/{login}",
+    "/login/{login}",
     status_code=status.HTTP_200_OK,
     response_model=UserResponse,
 )
@@ -36,6 +36,24 @@ async def get_user_by_login(
 ) -> UserResponse:
     try:
         return await use_case.execute(login=login, current_user=user, session=session)
+    except UserNotFoundByLoginException as exc:
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=exc.get_detail())
+
+
+@router.get(
+    "/id/{id}",
+    status_code=status.HTTP_200_OK,
+    response_model=UserResponse)
+async def get_user_by_id(
+    id: uuid.UUID,
+    user: UserResponse = Depends(AuthService.get_current_user),
+    use_case: GetUserByIdUseCase = Depends(get_user_by_id_use_case),
+    session: AsyncSession = Depends(get_db)
+) -> UserResponse:
+    try:
+        return await use_case.execute(id=id, current_user=user, session=session)
     except UserNotFoundByLoginException as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=exc.get_detail())
