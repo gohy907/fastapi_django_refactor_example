@@ -6,6 +6,8 @@ from starlette.middleware.cors import CORSMiddleware
 from src.api.routes.users import router as users_router
 from src.api.routes.categories import router as categories_router
 from src.core.exceptions.exc import DatabaseError, UserAlreadyExistsError, CategoryAlreadyExistsError, UserDoesNotExist
+from src.core.exceptions.domain_exceptions import UserUpdatingWithoutAuth
+
 from src.api.auth import router as auth_router
 
 
@@ -26,6 +28,14 @@ def create_app() -> FastAPI:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": exc.message},
+        )
+
+    @app.exception_handler(UserUpdatingWithoutAuth)
+    async def user_upgrading_without_auth(
+            request: Request, exc: UserUpdatingWithoutAuth):
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"message": exc.get_detail()}
         )
 
     @app.exception_handler(UserDoesNotExist)

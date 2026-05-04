@@ -1,14 +1,15 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from src.schemas.users import UserCreate
+from src.schemas.users import UserCreate, UserInternal, UserResponse
 
 from src.models.users import User as UserModel
 from src.core.exceptions.database_exceptions import UserNotFoundException, UserAlreadyExistsException
+from src.repositories.base import BaseRepository
 
 from typing import Type
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 from src.resources import get_password_hash
 
 
@@ -40,14 +41,11 @@ class UserRepository:
             raise UserNotFoundException()
         return user
 
-    async def create(self, session: AsyncSession, user_create: UserCreate) -> UserModel:
-
-        user_data = user_create.model_dump(exclude={"password"})
-        user_data["password_hash"] = get_password_hash(user_create.password)
+    async def create(self, session: AsyncSession, user_create: UserInternal) -> UserModel:
 
         query = (
             insert(self._model)
-            .values(**user_data)
+            .values(**user_create.model_dump())
             .returning(self._model)
         )
 
@@ -59,4 +57,24 @@ class UserRepository:
 
         except IntegrityError:
             await session.rollback()
+            raise UserAlreadyExistsException()
+
+    async def update(self, session: AsyncSession, id: uuid.UUID, user_update: UserInternal) -> UserModel:
+
+        query = (
+            update(self._model)
+            .where(self._model.id == id)
+            .values(**user_update.model_dump(exclude_unset=True))
+            .returning(self._model)
+        )
+
+        try:
+            result = await session.execute(query)
+            updated_user = result.scalar_one()
+
+            await session.flush()
+            if not updated_user:
+                raise UserNotFoundException()
+            return updated_user
+        except IntegrityError:
             raise UserAlreadyExistsException()

@@ -19,7 +19,7 @@ class CreateUserUseCase:
         repo = UserRepository()
 
         try:
-            user = await repo.create(session=session, user_create=user_in)
+            user = await repo.create(session=session, user_create=user_in.to_internal())
 
             await session.commit()
 

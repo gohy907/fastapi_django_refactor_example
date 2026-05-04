@@ -41,3 +41,10 @@ class WrongPasswordException(BaseDomainException):
 
     def __init__(self) -> None:
         super().__init__(detail=self._exception_text)
+
+
+class UserUpdatingWithoutAuth(BaseDomainException):
+    _exception_text: str = "Недостаточно прав для изменения профиля"
+
+    def __init__(self) -> None:
+        super().__init__(detail=self._exception_text)

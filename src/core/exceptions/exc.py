@@ -1,4 +1,5 @@
 from typing import Final
+import uuid
 
 from fastapi import HTTPException, status
 
@@ -62,3 +63,11 @@ class CredentialsException(HTTPException):
             detail=detail,
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+class UserUpdatingWithoutAuth(BaseException):
+    _ERROR_MESSAGE_TEMPLATE: Final[str] = "Forbidden to edit profile"
+
+    def __init__(self, message: str) -> None:
+        self.message = self._ERROR_MESSAGE_TEMPLATE
+        super().__init__(self.message)

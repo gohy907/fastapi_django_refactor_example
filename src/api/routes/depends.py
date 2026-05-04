@@ -5,6 +5,11 @@ from src.domain.categories.use_cases.get_category import GetCategoryByIdUseCase
 from src.domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
 from src.domain.auth.use_cases.authenticate_user import AuthenticateUserUseCase
 from src.domain.auth.use_cases.create_access_token import CreateAccessTokenUseCase
+from src.domain.users.use_cases.update_user import UpdateUserUseCase
+
+
+def update_user_use_case() -> UpdateUserUseCase:
+    return UpdateUserUseCase(get_user_use_case=get_user_by_id_use_case())
 
 
 def create_user_use_case() -> CreateUserUseCase:
