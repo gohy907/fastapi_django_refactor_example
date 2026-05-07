@@ -17,7 +17,7 @@ class UserNotFoundByLoginException(BaseDomainException):
 
 
 class UserNotFoundByIdException(BaseDomainException):
-    _exception_text_template = "Пользователь с логином='{id}' не найден"
+    _exception_text_template = "Пользователь с id='{id}' не найден"
 
     def __init__(self, id: id) -> None:
         self._exception_text_template = self._exception_text_template.format(

@@ -13,7 +13,7 @@ from src.api.routes.depends import create_user_use_case, get_user_by_id_use_case
 
 
 from src.domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
-from src.core.exceptions.domain_exceptions import UserNotFoundByLoginException, UserLoginIsNotUniqueException, UserUpdatingWithoutAuth
+from src.core.exceptions.domain_exceptions import UserNotFoundByLoginException, UserLoginIsNotUniqueException, UserUpdatingWithoutAuth, UserNotFoundByIdException
 from src.services.auth import AuthService
 
 router = APIRouter()
@@ -55,7 +55,7 @@ async def get_user_by_id(
 ) -> UserResponse:
     try:
         return await use_case.execute(id=id, current_user=user, session=session)
-    except UserNotFoundByLoginException as exc:
+    except UserNotFoundByIdException as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=exc.get_detail())
 
