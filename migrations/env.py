@@ -7,6 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from src.models.users import User
 from src.models.categories import Category
+from src.models.posts import Post
 
 from src.core.config import settings
 from src.core.db import Base
