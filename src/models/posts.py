@@ -14,3 +14,6 @@ class Post(Base):
     author_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("categories.id"))
     datetime_to_publish: Mapped[datetime] = mapped_column()
+
+    title: Mapped[str] = mapped_column(nullable=False)
+    body: Mapped[str] = mapped_column(nullable=False)

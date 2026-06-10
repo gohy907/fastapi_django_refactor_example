@@ -7,7 +7,8 @@ from schemas.categories import Category
 
 
 class PostBase(BaseModel):
-    text: str
+    title: str
+    body: str
     datetime_to_publish: datetime
     category_id: uuid.UUID
 
@@ -17,7 +18,8 @@ class PostCreate(PostBase):
 
 
 class PostUpdate(BaseModel):
-    text: str | None = None
+    title: str | None = None
+    body: str | None = None
     category_id: uuid.UUID | None = None
     datetime_to_publish: datetime | None = None
 
@@ -26,6 +28,7 @@ class Post(BaseModel):
     id: uuid.UUID
     author_id: uuid.UUID
     category: Category
-    text: str
     datetime_to_publish: datetime
+    title: str
+    body: str
     created_at: datetime
