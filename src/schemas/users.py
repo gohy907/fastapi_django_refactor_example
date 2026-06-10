@@ -4,6 +4,8 @@ from pydantic import BaseModel, ConfigDict, field_validator
 from fastapi import HTTPException, status
 from src.resources.auth import get_password_hash
 
+import re
+
 
 class UserBase(BaseModel):
     login: str
@@ -19,10 +21,10 @@ class UserCreate(UserBase):
     @field_validator("login")
     @classmethod
     def check_login(cls, login: str) -> str:
-        if not login.startswith("user_"):
+        if not bool(re.fullmatch(r'[a-z0-9]+', login, re.I)):
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Логин пользователя обязан начинаться с 'user_'"
+                detail="User login must contain only latin letters and digits"
             )
         return login
 
