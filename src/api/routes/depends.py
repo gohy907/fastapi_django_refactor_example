@@ -6,6 +6,7 @@ from src.domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
 from src.domain.auth.use_cases.authenticate_user import AuthenticateUserUseCase
 from src.domain.auth.use_cases.create_access_token import CreateAccessTokenUseCase
 from src.domain.users.use_cases.update_user import UpdateUserUseCase
+from src.domain.posts.use_cases.create_post import CreatePostUseCase
 
 
 def update_user_use_case() -> UpdateUserUseCase:
@@ -38,3 +39,7 @@ def authenticate_user_use_case() -> AuthenticateUserUseCase:
 
 def create_access_token_use_case() -> CreateAccessTokenUseCase:
     return CreateAccessTokenUseCase()
+
+
+def create_post_use_case() -> CreatePostUseCase:
+    return CreatePostUseCase()
