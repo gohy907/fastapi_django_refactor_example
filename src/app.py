@@ -6,7 +6,12 @@ from starlette.middleware.cors import CORSMiddleware
 from src.api.routes.users import router as users_router
 from src.api.routes.categories import router as categories_router
 from src.api.routes.posts import router as posts_router
-from src.core.exceptions.exc import DatabaseError, UserAlreadyExistsError, CategoryAlreadyExistsError, UserDoesNotExist
+from src.core.exceptions.exc import (
+    DatabaseError,
+    UserAlreadyExistsError,
+    CategoryAlreadyExistsError,
+    UserDoesNotExist,
+)
 from src.core.exceptions.domain_exceptions import UserUpdatingWithoutAuth
 
 from src.api.auth import router as auth_router
@@ -35,16 +40,14 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(UserUpdatingWithoutAuth)
     async def user_upgrading_without_auth(
-            request: Request, exc: UserUpdatingWithoutAuth):
+        request: Request, exc: UserUpdatingWithoutAuth
+    ):
         return JSONResponse(
-            status_code=status.HTTP_403_FORBIDDEN,
-            content={"message": exc.get_detail()}
+            status_code=status.HTTP_403_FORBIDDEN, content={"message": exc.get_detail()}
         )
 
     @app.exception_handler(UserDoesNotExist)
-    async def user_does_not_exist(
-        request: Request, exc: UserDoesNotExist
-    ):
+    async def user_does_not_exist(request: Request, exc: UserDoesNotExist):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"message": exc.message},
@@ -69,7 +72,7 @@ def create_app() -> FastAPI:
             message = error["msg"]
             errors.append(f"{field}: {message}")
         return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             content={"detail": errors},
         )
 
@@ -82,8 +85,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(users_router, prefix="/users", tags=["User APIs"])
-    app.include_router(categories_router,
-                       prefix="/categories", tags=["Category APIs"])
+    app.include_router(categories_router, prefix="/categories", tags=["Category APIs"])
 
     app.include_router(posts_router, prefix="/posts", tags=["Post APIs"])
     app.include_router(auth_router, tags=["Auth"])

@@ -21,16 +21,17 @@ class UserCreate(UserBase):
     @field_validator("login")
     @classmethod
     def check_login(cls, login: str) -> str:
-        if not bool(re.fullmatch(r'[a-z0-9]+', login, re.I)):
+        if not bool(re.fullmatch(r"[a-z0-9]+", login, re.I)):
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="User login must contain only latin letters and digits"
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="User login must contain only latin letters and digits",
             )
         return login
 
     def to_internal(self) -> UserInternal:
-        return UserInternal(login=self.login,
-                            password_hash=get_password_hash(self.password))
+        return UserInternal(
+            login=self.login, password_hash=get_password_hash(self.password)
+        )
 
 
 class UserResponse(UserBase):
