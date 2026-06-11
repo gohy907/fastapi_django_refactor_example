@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
+from sqlalchemy import func
 from src.core.db import Base
 
 
@@ -17,3 +18,5 @@ class Post(Base):
 
     title: Mapped[str] = mapped_column(nullable=False)
     body: Mapped[str] = mapped_column(nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
