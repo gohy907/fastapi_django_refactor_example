@@ -1,9 +1,7 @@
 import uuid
 
-from pydantic import BaseModel
 from datetime import datetime
-
-from schemas.categories import Category
+from pydantic import BaseModel, ConfigDict
 
 
 class PostBase(BaseModel):
@@ -24,11 +22,9 @@ class PostUpdate(BaseModel):
     datetime_to_publish: datetime | None = None
 
 
-class Post(BaseModel):
+class PostResponse(PostBase):
     id: uuid.UUID
     author_id: uuid.UUID
-    category: Category
-    datetime_to_publish: datetime
-    title: str
-    body: str
     created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
