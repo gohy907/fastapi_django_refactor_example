@@ -7,7 +7,7 @@ from src.schemas.users import UserCreate, UserResponse
 from fastapi import APIRouter, Depends,  status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.db import database
+from src.core.db import get_db
 
 from src.api.routes.depends import create_user_use_case, get_user_by_id_use_case, get_get_user_by_login_use_case, update_user_use_case
 
@@ -19,16 +19,6 @@ from src.services.auth import AuthService
 router = APIRouter()
 
 
-async def get_db():
-    async with database.session() as session:
-        yield session
-
-
-@router.get(
-    "/login/{login}",
-    status_code=status.HTTP_200_OK,
-    response_model=UserResponse,
-)
 async def get_user_by_login(
     login: str,
     user: UserResponse = Depends(AuthService.get_current_user),

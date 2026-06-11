@@ -22,7 +22,3 @@ class CreatePostUseCase:
 
         logger.info(f"Post {post.title} has been created")
         return PostResponse.model_validate(post)
-        # except PostAlreadyExistsException:
-        #     logger.info(
-        #         f"Post {post_create.title} already exists, aborting creation")
-        #     raise UserLoginIsNotUniqueException(login=user_in.login)

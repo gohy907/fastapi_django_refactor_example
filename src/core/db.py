@@ -6,7 +6,7 @@ from typing import Any, AsyncIterator, Dict
 from fastapi import HTTPException
 from sqlalchemy import JSON, Boolean, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.exc import PendingRollbackError, IntegrityError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -49,6 +49,11 @@ class PostgresDatabase:
 
 
 database = PostgresDatabase()
+
+
+async def get_db():
+    async with database.session() as session:
+        yield session
 
 
 class Base(DeclarativeBase):

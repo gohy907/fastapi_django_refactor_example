@@ -1,5 +1,7 @@
 from typing import Annotated
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from fastapi import Depends
 from pydantic import SecretStr
 from jose import JWTError, jwt
@@ -8,7 +10,7 @@ from src.core.exceptions.auth_exceptions import CredentialsException
 from src.core.exceptions.database_exceptions import UserNotFoundException
 from src.schemas.users import UserResponse
 from src.resources.auth import oauth2_scheme
-from src.core.db import database,  PostgresDatabase
+from src.core.db import get_db
 from src.repositories.users import UserRepository
 
 AUTH_EXCEPTION_MESSAGE = "Невозможно проверить данные авторизации"
@@ -19,8 +21,8 @@ AUTH_ALGORITHM = "HS256"
 
 class AuthService:
     @staticmethod
-    async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-        _database: PostgresDatabase = database
+    async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)],
+                               session: AsyncSession = Depends(get_db)):
         _repo: UserRepository = UserRepository()
 
         try:
@@ -36,8 +38,7 @@ class AuthService:
             raise CredentialsException(detail=AUTH_EXCEPTION_MESSAGE)
 
         try:
-            async with _database.session() as session:
-                user = await _repo.get_by_login(session=session, login=username)
+            user = await _repo.get_by_login(session=session, login=username)
         except UserNotFoundException:
             raise CredentialsException(detail=AUTH_EXCEPTION_MESSAGE)
 

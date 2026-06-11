@@ -4,19 +4,12 @@ from src.schemas.posts import PostCreate, PostResponse
 from fastapi import APIRouter, Depends,  status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.db import database
+from src.core.db import get_db
 
 from src.api.routes.depends import create_post_use_case
 
 from src.domain.posts.use_cases.create_post import CreatePostUseCase
 
-
-router = APIRouter()
-
-
-async def get_db():
-    async with database.session() as session:
-        yield session
 
 router = APIRouter()
 

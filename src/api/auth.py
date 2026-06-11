@@ -1,4 +1,4 @@
-from src.core.db import database
+from src.core.db import get_db
 from typing import Annotated
 from fastapi import APIRouter, status, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -9,10 +9,6 @@ from src.core.exceptions.domain_exceptions import WrongPasswordException, UserNo
 from src.api.routes.depends import create_access_token_use_case, authenticate_user_use_case
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
-async def get_db():
-    async with database.session() as session:
-        yield session
 
 router = APIRouter()
 
