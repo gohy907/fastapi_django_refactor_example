@@ -7,5 +7,13 @@ class UserNotFoundException(BaseDatabaseException):
     pass
 
 
+class PostNotFoundException(BaseDatabaseException):
+    pass
+
+
 class UserAlreadyExistsException(BaseDatabaseException):
+    pass
+
+
+class PostAlreadyExistsException(BaseDatabaseException):
     pass
