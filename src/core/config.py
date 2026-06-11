@@ -15,6 +15,9 @@ class Settings(BaseSettings):
 
     POSTGRES_SCHEMA: str = "public"
 
+    API_VERSION: str = "v1"
+    API_ROOT: str = f"/api/{API_VERSION}"
+
     @computed_field
     @property
     def postgres_url(self) -> str:

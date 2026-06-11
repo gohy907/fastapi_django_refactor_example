@@ -11,9 +11,11 @@ from src.core.exceptions.domain_exceptions import UserUpdatingWithoutAuth
 
 from src.api.auth import router as auth_router
 
+from src.core.config import settings
+
 
 def create_app() -> FastAPI:
-    app = FastAPI(root_path="/api/v1")
+    app = FastAPI(root_path=settings.API_ROOT)
 
     @app.exception_handler(DatabaseError)
     async def database_error_handler(request: Request, exc: DatabaseError):
