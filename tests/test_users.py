@@ -1,6 +1,8 @@
 import uuid
 from http import HTTPStatus
 
+from src.schemas.users import UserUpdate
+
 
 class TestCreateUser:
     async def test_create(self, async_client):
@@ -72,3 +74,29 @@ class TestGetUserByLogin:
     async def test_get_by_login_unauthorized(self, async_client, alice):
         response = await async_client.get(f"/users/login/{alice.login}")
         assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+
+class TestUpdateUser:
+    async def test_update(self, alice, alice_client, new_alice):
+        response = await alice_client.post(
+            f"/users/update/{alice.id}",
+            json={"login": new_alice.login, "password": new_alice.password},
+        )
+        assert response.status_code == HTTPStatus.OK
+        data = response.json()
+        assert data["login"] == new_alice.login
+        assert data["id"] == str(alice.id)
+
+    async def test_update_nonauthorized(self, alice, async_client, new_alice):
+        response = await async_client.post(
+            f"/users/update/{alice.id}",
+            json={"login": new_alice.login, "password": new_alice.password},
+        )
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+    async def test_update_forbidden(self, alice, bob_client, new_alice):
+        response = await bob_client.post(
+            f"/users/update/{alice.id}",
+            json={"login": new_alice.login, "password": new_alice.password},
+        )
+        assert response.status_code == HTTPStatus.FORBIDDEN

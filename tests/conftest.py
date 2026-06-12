@@ -11,7 +11,7 @@ from src.core.config import settings
 from src.core.db import Base, get_db
 
 from src.domain.users.use_cases.create_user import CreateUserUseCase
-from src.schemas.users import UserCreate
+from src.schemas.users import UserCreate, UserUpdate
 
 
 from jose import jwt
@@ -98,6 +98,11 @@ async def alice_client(async_client, alice):
     )
     async_client.headers["Authorization"] = f"Bearer {token}"
     yield async_client
+
+
+@pytest_asyncio.fixture
+async def new_alice():
+    yield UserUpdate(login="notsoalice", password="password2")
 
 
 @pytest_asyncio.fixture(scope="session")
