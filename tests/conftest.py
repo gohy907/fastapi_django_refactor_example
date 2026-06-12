@@ -38,24 +38,6 @@ def sync_engine(db_url):
     Base.metadata.drop_all(engine)
 
 
-@pytest_asyncio.fixture(scope="session")
-async def created_user(sync_engine, db_url):
-
-    engine = create_async_engine(db_url)
-    async with async_sessionmaker(
-        bind=engine,
-        expire_on_commit=False,
-        class_=AsyncSession,
-    )() as session:
-        use_case = CreateUserUseCase()
-        user = await use_case.execute(
-            session=session,
-            user_in=UserCreate(login="notrealuser", password="password"),
-        )
-    await engine.dispose()
-    return user
-
-
 @pytest_asyncio.fixture
 async def async_client(db_url, sync_engine):
     engine = create_async_engine(db_url)
@@ -86,13 +68,31 @@ async def async_client(db_url, sync_engine):
     await engine.dispose()
 
 
+@pytest_asyncio.fixture(scope="session")
+async def alice(sync_engine, db_url):
+
+    engine = create_async_engine(db_url)
+    async with async_sessionmaker(
+        bind=engine,
+        expire_on_commit=False,
+        class_=AsyncSession,
+    )() as session:
+        use_case = CreateUserUseCase()
+        user = await use_case.execute(
+            session=session,
+            user_in=UserCreate(login="alice", password="password"),
+        )
+    await engine.dispose()
+    return user
+
+
 @pytest_asyncio.fixture
-async def auth_client(async_client, created_user):
+async def alice_client(async_client, alice):
     from jose import jwt
     from src.services.auth import SECRET_AUTH_KEY, AUTH_ALGORITHM
 
     token = jwt.encode(
-        claims={"sub": created_user.login},
+        claims={"sub": alice.login},
         key=SECRET_AUTH_KEY.get_secret_value(),
         algorithm=AUTH_ALGORITHM,
     )

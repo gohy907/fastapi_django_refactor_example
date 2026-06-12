@@ -34,41 +34,41 @@ class TestCreateUser:
 
 
 class TestGetUserById:
-    async def test_get_by_id(self, auth_client, created_user):
-        response = await auth_client.get(f"/users/id/{created_user.id}")
+    async def test_get_by_id(self, alice_client, alice):
+        response = await alice_client.get(f"/users/id/{alice.id}")
         assert response.status_code == HTTPStatus.OK
 
         data = response.json()
-        assert data["login"] == created_user.login
-        assert data["id"] == str(created_user.id)
+        assert data["login"] == alice.login
+        assert data["id"] == str(alice.id)
 
-    async def test_get_by_id_nonexistent(self, auth_client, created_user):
+    async def test_get_by_id_nonexistent(self, alice_client, alice):
 
-        nonexistent_id = uuid.UUID(int=created_user.id.int ^ 1)
+        nonexistent_id = uuid.UUID(int=alice.id.int ^ 1)
         # если использовать uuid.uuid4(), то раз в триллион запусков тест упадёт
         # я не хочу полагаться на рандом)
-        response = await auth_client.get(f"/users/id/{nonexistent_id}")
+        response = await alice_client.get(f"/users/id/{nonexistent_id}")
         assert response.status_code == HTTPStatus.NOT_FOUND
 
-    async def test_get_by_id_unauthorized(self, async_client, created_user):
-        response = await async_client.get(f"/users/id/{created_user.id}")
+    async def test_get_by_id_unauthorized(self, async_client, alice):
+        response = await async_client.get(f"/users/id/{alice.id}")
         assert response.status_code == HTTPStatus.UNAUTHORIZED
 
 
 class TestGetUserByLogin:
-    async def test_get_by_login(self, auth_client, created_user):
-        response = await auth_client.get(f"/users/login/{created_user.login}")
+    async def test_get_by_login(self, alice_client, alice):
+        response = await alice_client.get(f"/users/login/{alice.login}")
         assert response.status_code == HTTPStatus.OK
 
         data = response.json()
-        assert data["login"] == created_user.login
-        assert data["id"] == str(created_user.id)
+        assert data["login"] == alice.login
+        assert data["id"] == str(alice.id)
 
-    async def test_get_by_login_nonexistent(self, auth_client, created_user):
+    async def test_get_by_login_nonexistent(self, alice_client, alice):
         nonexistent_login = "koitese"
-        response = await auth_client.get(f"/users/login/{nonexistent_login}")
+        response = await alice_client.get(f"/users/login/{nonexistent_login}")
         assert response.status_code == HTTPStatus.NOT_FOUND
 
-    async def test_get_by_login_unauthorized(self, async_client, created_user):
-        response = await async_client.get(f"/users/login/{created_user.login}")
+    async def test_get_by_login_unauthorized(self, async_client, alice):
+        response = await async_client.get(f"/users/login/{alice.login}")
         assert response.status_code == HTTPStatus.UNAUTHORIZED
