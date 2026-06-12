@@ -14,6 +14,10 @@ from src.domain.users.use_cases.create_user import CreateUserUseCase
 from src.schemas.users import UserCreate
 
 
+from jose import jwt
+from src.services.auth import SECRET_AUTH_KEY, AUTH_ALGORITHM
+
+
 @pytest.fixture(scope="session")
 def pg_container():
     with PostgresContainer("postgres:18.1") as pg:
@@ -70,7 +74,6 @@ async def async_client(db_url, sync_engine):
 
 @pytest_asyncio.fixture(scope="session")
 async def alice(sync_engine, db_url):
-
     engine = create_async_engine(db_url)
     async with async_sessionmaker(
         bind=engine,
@@ -88,11 +91,36 @@ async def alice(sync_engine, db_url):
 
 @pytest_asyncio.fixture
 async def alice_client(async_client, alice):
-    from jose import jwt
-    from src.services.auth import SECRET_AUTH_KEY, AUTH_ALGORITHM
-
     token = jwt.encode(
         claims={"sub": alice.login},
+        key=SECRET_AUTH_KEY.get_secret_value(),
+        algorithm=AUTH_ALGORITHM,
+    )
+    async_client.headers["Authorization"] = f"Bearer {token}"
+    yield async_client
+
+
+@pytest_asyncio.fixture(scope="session")
+async def bob(sync_engine, db_url):
+    engine = create_async_engine(db_url)
+    async with async_sessionmaker(
+        bind=engine,
+        expire_on_commit=False,
+        class_=AsyncSession,
+    )() as session:
+        use_case = CreateUserUseCase()
+        user = await use_case.execute(
+            session=session,
+            user_in=UserCreate(login="bob", password="password"),
+        )
+    await engine.dispose()
+    return user
+
+
+@pytest_asyncio.fixture
+async def bob_client(async_client, bob):
+    token = jwt.encode(
+        claims={"sub": bob.login},
         key=SECRET_AUTH_KEY.get_secret_value(),
         algorithm=AUTH_ALGORITHM,
     )
