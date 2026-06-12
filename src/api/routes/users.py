@@ -19,6 +19,10 @@ from src.services.auth import AuthService
 router = APIRouter()
 
 
+@router.get(
+    "/login/{login}",
+    status_code=status.HTTP_200_OK,
+    response_model=UserResponse)
 async def get_user_by_login(
     login: str,
     user: UserResponse = Depends(AuthService.get_current_user),
