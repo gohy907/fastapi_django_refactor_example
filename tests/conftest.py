@@ -171,9 +171,9 @@ async def alice_post(sync_engine, db_url, alice, alice_category):
         post = await use_case.execute(
             session=session,
             post_create=PostCreate(
-                title="мой первый пост!!",
-                body="абоба всем дорогие слушатели",
-                datetime_to_publish="02.03.2006:08:09:07Z",
+                title="Alice's Post",
+                body="Post Description",
+                datetime_to_publish="2000-01-01T00:00:00Z",
                 category_id=alice_category.id,
                 author_id=alice.id,
             ),
