@@ -1,10 +1,8 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
 
 from src.models.posts import Post as PostModel
 from src.core.exceptions.database_exceptions import (
-    EntityAlreadyExistsException,
     EntityNotFoundException,
 )
 
@@ -16,18 +14,19 @@ from src.schemas.posts import PostCreate
 
 
 class PostRepository:
-    def __init__(self):
+    def __init__(self, session: AsyncSession):
         self._model: Type[PostModel] = PostModel
+        self.session: AsyncSession = session
 
-    async def get_by_id(self, session: AsyncSession, id: uuid.UUID) -> PostModel:
+    async def get_by_id(self, id: uuid.UUID) -> PostModel:
         query = select(self._model).where(self._model.id == id)
-        result = await session.execute(query)
+        result = await self.session.execute(query)
         post = result.scalar_one_or_none()
         if not post:
             raise EntityNotFoundException()
         return post
 
-    async def create(self, session: AsyncSession, post_create: PostCreate) -> PostModel:
+    async def create(self, post_create: PostCreate) -> PostModel:
 
         query = (
             insert(self._model)
@@ -35,7 +34,7 @@ class PostRepository:
             .returning(self._model)
         )
 
-        result = await session.execute(query)
+        result = await self.session.execute(query)
         created_post = result.scalar_one()
-        await session.flush()
+        await self.session.flush()
         return created_post

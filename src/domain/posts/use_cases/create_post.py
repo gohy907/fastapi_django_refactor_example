@@ -46,9 +46,9 @@ class CreatePostUseCase:
         except EntityNotFoundException:
             raise CategoryNotFoundByIdException(id=post_create.category_id)
 
-        post_repo = PostRepository()
+        post_repo = PostRepository(session)
 
-        post = await post_repo.create(session=session, post_create=post_create)
+        post = await post_repo.create(post_create=post_create)
 
         await session.commit()
 
