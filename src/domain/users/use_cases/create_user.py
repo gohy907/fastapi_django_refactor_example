@@ -24,7 +24,7 @@ class CreateUserUseCase:
         try:
             user = await repo.create(user_create=user_create.to_internal())
 
-            await session.commit()
+            await session.flush()
 
             logger.info(f"User {user.login} has been created")
             return UserResponse.model_validate(user)

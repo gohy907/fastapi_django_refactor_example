@@ -41,6 +41,6 @@ class CreateCategoryUseCase:
                 f"Category {category_create.title} already exists, aborting creation"
             )
             raise CategoryAlreadyExistsException(title=category_create.title)
-        await session.commit()
+        await session.flush()
 
         return CategoryResponse.model_validate(category)

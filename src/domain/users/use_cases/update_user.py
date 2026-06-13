@@ -54,7 +54,7 @@ class UpdateUserUseCase:
             )
             raise error
 
-        await session.commit()
+        await session.flush()
 
         user = UserResponse.model_validate(obj=updated_user)
         return user

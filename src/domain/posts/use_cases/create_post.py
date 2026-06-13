@@ -50,7 +50,7 @@ class CreatePostUseCase:
 
         post = await post_repo.create(post_create=post_create)
 
-        await session.commit()
+        await session.flush()
 
         logger.info(f"Post {post.title} has been created")
         return PostResponse.model_validate(post)

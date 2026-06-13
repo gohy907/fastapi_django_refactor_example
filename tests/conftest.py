@@ -46,24 +46,25 @@ def sync_engine(db_url):
     Base.metadata.drop_all(engine)
 
 
-@pytest_asyncio.fixture(loop_scope="session")
-async def async_client(db_url, sync_engine):
+@pytest_asyncio.fixture
+async def db_session(db_url):
     engine = create_async_engine(db_url)
-
     SessionFactory = async_sessionmaker(
         bind=engine,
         expire_on_commit=False,
         class_=AsyncSession,
     )
+    session = SessionFactory()
+    await session.begin()
+    yield session
+    await session.rollback()
+    await session.close()
 
+
+@pytest_asyncio.fixture
+async def async_client(db_url, sync_engine, db_session):
     async def override_get_db():
-        session = SessionFactory()
-        try:
-            await session.begin()
-            await session.begin_nested()
-            yield session
-        finally:
-            await session.close()
+        yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
 
@@ -73,7 +74,6 @@ async def async_client(db_url, sync_engine):
         yield ac
 
     app.dependency_overrides.clear()
-    await engine.dispose()
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -89,19 +89,22 @@ async def alice(sync_engine, db_url):
             session=session,
             user_create=UserCreate(login="alice", password="password"),
         )
-    await engine.dispose()
+        await session.commit()
     return user
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture
 async def alice_client(async_client, alice):
     token = jwt.encode(
         claims={"sub": alice.login},
         key=SECRET_AUTH_KEY.get_secret_value(),
         algorithm=AUTH_ALGORITHM,
     )
-    async_client.headers["Authorization"] = f"Bearer {token}"
-    yield async_client
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url=f"http://test{settings.API_ROOT}"
+    ) as ac:
+        ac.headers["Authorization"] = f"Bearer {token}"
+        yield ac
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -122,19 +125,22 @@ async def bob(sync_engine, db_url):
             session=session,
             user_create=UserCreate(login="bob", password="password"),
         )
-    await engine.dispose()
+        await session.commit()
     return user
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture
 async def bob_client(async_client, bob):
     token = jwt.encode(
         claims={"sub": bob.login},
         key=SECRET_AUTH_KEY.get_secret_value(),
         algorithm=AUTH_ALGORITHM,
     )
-    async_client.headers["Authorization"] = f"Bearer {token}"
-    yield async_client
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url=f"http://test{settings.API_ROOT}"
+    ) as ac:
+        ac.headers["Authorization"] = f"Bearer {token}"
+        yield ac
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -155,7 +161,7 @@ async def alice_category(db_url, alice):
                 author_id=alice.id,
             ),
         )
-    await engine.dispose()
+        await session.commit()
     return category
 
 
@@ -179,5 +185,5 @@ async def alice_post(sync_engine, db_url, alice, alice_category):
             ),
             current_user=alice,
         )
-    await engine.dispose()
+        await session.commit()
     return post
