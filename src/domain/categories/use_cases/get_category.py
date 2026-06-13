@@ -30,10 +30,10 @@ class GetCategoryByTitleUseCase:
         pass
 
     async def execute(self, session: AsyncSession, title: str) -> CategoryResponse:
+        repo = CategoryRepository(session)
         try:
-            repo = CategoryRepository(session)
+            category = await repo.get_by_title(title)
         except EntityNotFoundException:
             raise CategoryNotFoundByTitleException(title=title)
 
-        category = await repo.get_by_title(title)
         return CategoryResponse.model_validate(category)

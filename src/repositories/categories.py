@@ -40,7 +40,7 @@ class CategoryRepository:
             await self.session.rollback()
             raise EntityAlreadyExistsException()
 
-    async def get_by_title(self, title: str) -> Optional[Category]:
+    async def get_by_title(self, title: str) -> Category:
         query = select(Category).where(Category.title == title)
         result = await self.session.execute(query)
         category = result.scalar_one_or_none()
@@ -48,7 +48,7 @@ class CategoryRepository:
             raise EntityNotFoundException()
         return category
 
-    async def get_by_id(self, id: uuid.UUID) -> Optional[Category]:
+    async def get_by_id(self, id: uuid.UUID) -> Category:
         query = select(Category).where(Category.id == id)
         result = await self.session.execute(query)
         category = result.scalar_one_or_none()

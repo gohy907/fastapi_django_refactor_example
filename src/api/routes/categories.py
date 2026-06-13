@@ -6,16 +6,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.schemas.categories import CategoryCreate, CategoryResponse
 from src.core.db import get_db
 
-from src.api.routes.depends import create_category_use_case, get_category_by_id_use_case
+from src.api.routes.depends import (
+    create_category_use_case,
+    get_category_by_id_use_case,
+    get_category_by_title_use_case,
+)
 
 from src.domain.categories.use_cases.create_category import CreateCategoryUseCase
 from src.domain.categories.use_cases.get_category import (
     GetCategoryByIdUseCase,
+    GetCategoryByTitleUseCase,
 )
 
 from src.core.exceptions.domain_exceptions import (
     CategoryAlreadyExistsException,
     CategoryNotFoundByIdException,
+    CategoryNotFoundByTitleException,
     UserNotFoundByIdException,
 )
 
@@ -34,6 +40,24 @@ async def get_category_by_id(
     try:
         category = await use_case.execute(session=session, id=id)
     except CategoryNotFoundByIdException as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=exc.get_detail()
+        )
+
+    return category
+
+
+@router.get(
+    "/title/{title}", status_code=status.HTTP_200_OK, response_model=CategoryResponse
+)
+async def get_category_by_title(
+    title: str,
+    session: AsyncSession = Depends(get_db),
+    use_case: GetCategoryByTitleUseCase = Depends(get_category_by_title_use_case),
+) -> CategoryResponse:
+    try:
+        category = await use_case.execute(session=session, title=title)
+    except CategoryNotFoundByTitleException as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=exc.get_detail()
         )
