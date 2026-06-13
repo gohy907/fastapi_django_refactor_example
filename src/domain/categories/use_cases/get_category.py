@@ -2,7 +2,6 @@ import uuid
 
 from src.repositories.categories import CategoryRepository
 from src.schemas.categories import CategoryResponse
-from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 

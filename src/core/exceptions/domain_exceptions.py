@@ -80,13 +80,3 @@ class CategoryNotFoundByTitleException(BaseDomainException):
             title=title
         )
         super().__init__(detail=self._exception_text_template)
-
-
-class DatabaseError(BaseDomainException):
-    _exception_text_template = "Database error: {message}"
-
-    def __init__(self, message: str) -> None:
-        self._exception_text_template = self._exception_text_template.format(
-            message=message
-        )
-        super().__init__(detail=self._exception_text_template)

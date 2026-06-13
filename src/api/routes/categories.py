@@ -13,7 +13,10 @@ from src.domain.categories.use_cases.get_category import (
     GetCategoryByIdUseCase,
 )
 
-from src.core.exceptions.domain_exceptions import CategoryAlreadyExistsException
+from src.core.exceptions.domain_exceptions import (
+    CategoryAlreadyExistsException,
+    CategoryNotFoundByIdException,
+)
 
 from src.services.auth import AuthService
 from src.schemas.users import UserResponse
@@ -27,7 +30,13 @@ async def get_category_by_id(
     session: AsyncSession = Depends(get_db),
     use_case: GetCategoryByIdUseCase = Depends(get_category_by_id_use_case),
 ) -> CategoryResponse:
-    category = await use_case.execute(session=session, id=id)
+    try:
+        category = await use_case.execute(session=session, id=id)
+    except CategoryNotFoundByIdException as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=exc.get_detail()
+        )
+
     return category
 
 

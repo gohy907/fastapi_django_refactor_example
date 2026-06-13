@@ -20,9 +20,8 @@ class CreateCategoryUseCase:
         self, session: AsyncSession, category_in: CategoryCreate
     ) -> CategoryResponse:
         repo = CategoryRepository(session)
-        category_data = category_in.model_dump()
         try:
-            category = await repo.create(category_data)
+            category = await repo.create(category_in)
 
         except EntityAlreadyExistsException:
             logger.info(

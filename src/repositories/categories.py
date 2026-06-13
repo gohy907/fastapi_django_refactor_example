@@ -4,7 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.categories import Category
-from src.repositories.base import BaseRepository
+
+from src.schemas.categories import CategoryCreate
 
 from sqlalchemy.exc import IntegrityError
 from src.core.exceptions.database_exceptions import (
@@ -12,36 +13,45 @@ from src.core.exceptions.database_exceptions import (
     EntityNotFoundException,
 )
 
+from sqlalchemy import insert
+from typing import Type
+
 import uuid
 
 
-class CategoryRepository(BaseRepository[Category]):
-    async def create(self, data: dict) -> Category:
-        try:
-            return await super().create(data)
-        except IntegrityError as e:
-            error_msg = str(e.orig).lower()
-            if "foreign key" in error_msg or "is not present in table" in error_msg:
-                raise EntityNotFoundException
-
-            if (
-                "already exists" in error_msg
-                or "duplicate key" in error_msg
-                or "unique constraint" in error_msg
-            ):
-                raise EntityAlreadyExistsException
-
-            # raise e
-
+class CategoryRepository:
     def __init__(self, session: AsyncSession):
-        super().__init__(Category, session)
+        self.session: AsyncSession = session
+        self._model: Type[Category] = Category
+
+    async def create(self, category_create: CategoryCreate) -> Category:
+        query = (
+            insert(self._model)
+            .values(**category_create.model_dump())
+            .returning(self._model)
+        )
+        try:
+            result = await self.session.execute(query)
+            created_category = result.scalar_one()
+            await self.session.flush()
+            return created_category
+
+        except IntegrityError:
+            await self.session.rollback()
+            raise EntityAlreadyExistsException()
 
     async def get_by_title(self, title: str) -> Optional[Category]:
         query = select(Category).where(Category.title == title)
         result = await self.session.execute(query)
-        return result.scalar_one_or_none()
+        category = result.scalar_one_or_none()
+        if not category:
+            raise EntityNotFoundException()
+        return category
 
     async def get_by_id(self, id: uuid.UUID) -> Optional[Category]:
         query = select(Category).where(Category.id == id)
         result = await self.session.execute(query)
-        return result.scalar_one_or_none()
+        category = result.scalar_one_or_none()
+        if not category:
+            raise EntityNotFoundException()
+        return category

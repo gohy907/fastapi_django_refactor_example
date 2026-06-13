@@ -7,15 +7,14 @@ from src.api.routes.users import router as users_router
 from src.api.routes.categories import router as categories_router
 from src.api.routes.posts import router as posts_router
 from src.core.exceptions.domain_exceptions import (
-    DatabaseError,
     UserAlreadyExistsException,
     UserUpdatingWithoutAuth,
     UserNotFoundByIdException,
     UserNotFoundByLoginException,
     CategoryAlreadyExistsException,
-    CategoryNotFoundByIdException,
-    CategoryNotFoundByTitleException,
 )
+
+from src.core.exceptions.database_exceptions import DatabaseError
 
 from src.api.auth import router as auth_router
 
