@@ -47,13 +47,13 @@ async def get_category_by_id(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_category(
-    category_in: CategoryCreate,
+    category_create: CategoryCreate,
     session: AsyncSession = Depends(get_db),
     user: UserResponse = Depends(AuthService.get_current_user),
     use_case: CreateCategoryUseCase = Depends(create_category_use_case),
 ) -> CategoryResponse:
     try:
-        user = await use_case.execute(session=session, category_in=category_in)
+        user = await use_case.execute(session=session, category_create=category_create)
         return user
 
     except CategoryAlreadyExistsException as exc:

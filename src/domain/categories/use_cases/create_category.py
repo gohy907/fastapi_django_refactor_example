@@ -24,23 +24,23 @@ class CreateCategoryUseCase:
         pass
 
     async def execute(
-        self, session: AsyncSession, category_in: CategoryCreate
+        self, session: AsyncSession, category_create: CategoryCreate
     ) -> CategoryResponse:
         user_repo = UserRepository(session)
         try:
-            await user_repo.get_by_id(category_in.author_id)
+            await user_repo.get_by_id(category_create.author_id)
         except EntityNotFoundException:
-            raise UserNotFoundByIdException(id=category_in.author_id)
+            raise UserNotFoundByIdException(id=category_create.author_id)
 
         category_repo = CategoryRepository(session)
         try:
-            category = await category_repo.create(category_in)
+            category = await category_repo.create(category_create)
 
         except EntityAlreadyExistsException:
             logger.info(
-                f"Category {category_in.title} already exists, aborting creation"
+                f"Category {category_create.title} already exists, aborting creation"
             )
-            raise CategoryAlreadyExistsException(title=category_in.title)
+            raise CategoryAlreadyExistsException(title=category_create.title)
         await session.commit()
 
         return CategoryResponse.model_validate(category)
