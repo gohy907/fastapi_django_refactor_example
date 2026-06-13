@@ -1,5 +1,4 @@
 import logging
-import uuid
 
 from src.core.db import database
 from src.repositories.users import UserRepository
@@ -14,13 +13,14 @@ logger = logging.getLogger(__name__)
 class GetUserByLoginUseCase:
     def __init__(self):
         self._database = database
-        self._repo = UserRepository()
 
     async def execute(
         self, session: AsyncSession, login: str, current_user: UserResponse
     ) -> UserResponse:
+
+        repo = UserRepository(session)
         try:
-            user = await self._repo.get_by_login(session=session, login=login)
+            user = await repo.get_by_login(login=login)
         except EntityNotFoundException:
             error = UserNotFoundByLoginException(login=login)
             logger.error(

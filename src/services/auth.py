@@ -26,7 +26,7 @@ class AuthService:
         token: Annotated[str, Depends(oauth2_scheme)],
         session: AsyncSession = Depends(get_db),
     ):
-        _repo: UserRepository = UserRepository()
+        repo: UserRepository = UserRepository(session)
 
         try:
             payload = jwt.decode(
@@ -41,7 +41,7 @@ class AuthService:
             raise CredentialsException(detail=AUTH_EXCEPTION_MESSAGE)
 
         try:
-            user = await _repo.get_by_login(session=session, login=username)
+            user = await repo.get_by_login(login=username)
         except EntityNotFoundException:
             raise CredentialsException(detail=AUTH_EXCEPTION_MESSAGE)
 

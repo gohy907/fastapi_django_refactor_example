@@ -23,9 +23,9 @@ class AuthenticateUserUseCase:
         password: str,
         session: AsyncSession,
     ) -> UserSchema:
-        repo = UserRepository()
+        repo = UserRepository(session)
         try:
-            user = await repo.get_by_login(session=session, login=login)
+            user = await repo.get_by_login(login=login)
         except EntityNotFoundException:
             error = UserNotFoundByLoginException(login=login)
             logger.error(error.get_detail())

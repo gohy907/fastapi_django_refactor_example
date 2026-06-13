@@ -16,16 +16,18 @@ class CreateUserUseCase:
     def __init__(self):
         self._database = database
 
-    async def execute(self, session: AsyncSession, user_in: UserCreate) -> UserResponse:
-        repo = UserRepository()
+    async def execute(
+        self, session: AsyncSession, user_create: UserCreate
+    ) -> UserResponse:
+        repo = UserRepository(session)
 
         try:
-            user = await repo.create(session=session, user_create=user_in.to_internal())
+            user = await repo.create(user_create=user_create.to_internal())
 
             await session.commit()
 
             logger.info(f"User {user.login} has been created")
             return UserResponse.model_validate(user)
         except EntityAlreadyExistsException:
-            logger.info(f"User {user_in.login} already exists, aborting creation")
-            raise UserAlreadyExistsException(login=user_in.login)
+            logger.info(f"User {user_create.login} already exists, aborting creation")
+            raise UserAlreadyExistsException(login=user_create.login)

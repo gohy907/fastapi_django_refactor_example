@@ -70,7 +70,7 @@ async def create_user(
     session: AsyncSession = Depends(get_db),
 ) -> UserResponse:
     try:
-        user = await use_case.execute(user_in=user, session=session)
+        user = await use_case.execute(user_create=user, session=session)
         return user
     except UserAlreadyExistsException as exc:
         raise HTTPException(

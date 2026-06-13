@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 class UpdateUserUseCase:
     def __init__(self, get_user_use_case: GetUserByIdUseCase):
         self._get_user_use_case = get_user_use_case
-        self._repo = UserRepository()
 
     async def execute(
         self,
@@ -27,6 +26,7 @@ class UpdateUserUseCase:
         current_user: UserResponse,
         user_update: UserUpdate,
     ) -> UserResponse:
+
         if current_user.id != id:
             error = UserUpdatingWithoutAuth()
 
@@ -38,9 +38,11 @@ class UpdateUserUseCase:
                 }"
             )
             raise error
+
+        repo = UserRepository(session)
         try:
-            updated_user = await self._repo.update(
-                session=session, id=id, user_update=user_update.to_internal()
+            updated_user = await repo.update(
+                id=id, user_update=user_update.to_internal()
             )
         except EntityAlreadyExistsException:
             logger.info(f"User {user_update.login} already exists, aborting creation")

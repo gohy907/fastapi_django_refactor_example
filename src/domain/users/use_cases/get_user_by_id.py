@@ -14,13 +14,14 @@ logger = logging.getLogger(__name__)
 class GetUserByIdUseCase:
     def __init__(self):
         self._database = database
-        self._repo = UserRepository()
 
     async def execute(
         self, session: AsyncSession, id: uuid.UUID, current_user: UserResponse
     ) -> UserResponse:
+
+        repo = UserRepository(session)
         try:
-            user = await self._repo.get_by_id(session=session, id=id)
+            user = await repo.get_by_id(id=id)
         except EntityNotFoundException:
             error = UserNotFoundByIdException(id=id)
             logger.error(
