@@ -1,26 +1,24 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-from src.schemas.users import UserCreate, UserInternal, UserResponse
+from src.schemas.users import UserInternal
 
-from src.models.users import User as UserModel
+from src.models.users import User
 from src.core.exceptions.database_exceptions import (
     EntityAlreadyExistsException,
     EntityNotFoundException,
 )
-from src.repositories.base import BaseRepository
 
 from typing import Type
 
 from sqlalchemy import insert, select, update
-from src.resources import get_password_hash
 
 
 class UserRepository:
     def __init__(self):
-        self._model: Type[UserModel] = UserModel
+        self._model: Type[User] = User
 
-    async def get_by_login(self, session: AsyncSession, login: str) -> UserModel:
+    async def get_by_login(self, session: AsyncSession, login: str) -> User:
         query = select(self._model).where(self._model.login == login)
 
         result = await session.execute(query)
@@ -30,7 +28,7 @@ class UserRepository:
 
         return user
 
-    async def get_by_id(self, session: AsyncSession, id: uuid.UUID) -> UserModel:
+    async def get_by_id(self, session: AsyncSession, id: uuid.UUID) -> User:
         query = select(self._model).where(self._model.id == id)
         result = await session.execute(query)
         user = result.scalar_one_or_none()
@@ -38,9 +36,7 @@ class UserRepository:
             raise EntityNotFoundException()
         return user
 
-    async def create(
-        self, session: AsyncSession, user_create: UserInternal
-    ) -> UserModel:
+    async def create(self, session: AsyncSession, user_create: UserInternal) -> User:
 
         query = (
             insert(self._model)
@@ -60,7 +56,7 @@ class UserRepository:
 
     async def update(
         self, session: AsyncSession, id: uuid.UUID, user_update: UserInternal
-    ) -> UserModel:
+    ) -> User:
 
         query = (
             update(self._model)
