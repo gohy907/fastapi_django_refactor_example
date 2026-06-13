@@ -160,6 +160,7 @@ async def alice_category(db_url, alice):
                 is_published=True,
                 author_id=alice.id,
             ),
+            current_user=alice,
         )
         await session.commit()
     return category

@@ -23,6 +23,7 @@ from src.core.exceptions.domain_exceptions import (
     CategoryNotFoundByIdException,
     CategoryNotFoundByTitleException,
     UserNotFoundByIdException,
+    UserDoingForbiddenActions,
 )
 
 from src.services.auth import AuthService
@@ -73,12 +74,14 @@ async def get_category_by_title(
 async def create_category(
     category_create: CategoryCreate,
     session: AsyncSession = Depends(get_db),
-    user: UserResponse = Depends(AuthService.get_current_user),
+    current_user: UserResponse = Depends(AuthService.get_current_user),
     use_case: CreateCategoryUseCase = Depends(create_category_use_case),
 ) -> CategoryResponse:
     try:
-        user = await use_case.execute(session=session, category_create=category_create)
-        return user
+        category = await use_case.execute(
+            current_user=current_user, session=session, category_create=category_create
+        )
+        return category
 
     except CategoryAlreadyExistsException as exc:
         raise HTTPException(
@@ -88,4 +91,7 @@ async def create_category(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=exc.get_detail()
         )
-    return user
+    except UserDoingForbiddenActions as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=exc.get_detail()
+        )

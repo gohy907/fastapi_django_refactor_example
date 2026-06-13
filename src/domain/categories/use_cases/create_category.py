@@ -1,6 +1,7 @@
 from src.repositories.categories import CategoryRepository
 from src.repositories.users import UserRepository
 
+from src.schemas.users import UserResponse
 from src.schemas.categories import CategoryResponse, CategoryCreate
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +13,7 @@ from src.core.exceptions.database_exceptions import (
 from src.core.exceptions.domain_exceptions import (
     CategoryAlreadyExistsException,
     UserNotFoundByIdException,
+    UserDoingForbiddenActions,
 )
 
 import logging
@@ -24,13 +26,19 @@ class CreateCategoryUseCase:
         pass
 
     async def execute(
-        self, session: AsyncSession, category_create: CategoryCreate
+        self,
+        session: AsyncSession,
+        current_user: UserResponse,
+        category_create: CategoryCreate,
     ) -> CategoryResponse:
         user_repo = UserRepository(session)
         try:
             await user_repo.get_by_id(category_create.author_id)
         except EntityNotFoundException:
             raise UserNotFoundByIdException(id=category_create.author_id)
+
+        if current_user.id != category_create.author_id:
+            raise UserDoingForbiddenActions(id=current_user.id)
 
         category_repo = CategoryRepository(session)
         try:

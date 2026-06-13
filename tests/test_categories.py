@@ -39,6 +39,34 @@ class TestCreateCategory:
 
         assert response.status_code == HTTPStatus.CONFLICT
 
+    async def test_create_another_account(self, bob_client, alice):
+        category_create = CategoryCreate(
+            title="Category Title",
+            description="Category Description",
+            is_published=True,
+            author_id=alice.id,
+        )
+
+        response = await bob_client.post(
+            "/categories/create", json=category_create.model_dump(mode="json")
+        )
+        assert response.status_code == HTTPStatus.FORBIDDEN
+
+    async def test_create_nonexistent(self, alice_client, alice):
+
+        nonexistent_id = uuid.UUID(int=alice.id.int ^ 1)
+        category_create = CategoryCreate(
+            title="Category Title",
+            description="Category Description",
+            is_published=True,
+            author_id=nonexistent_id,
+        )
+
+        response = await alice_client.post(
+            "/categories/create", json=category_create.model_dump(mode="json")
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+
     async def test_create_unauthorized(self, async_client, alice):
         category_create = CategoryCreate(
             title="Category Title",
