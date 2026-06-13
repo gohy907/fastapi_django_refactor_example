@@ -80,3 +80,11 @@ class CategoryNotFoundByTitleException(BaseDomainException):
             title=title
         )
         super().__init__(detail=self._exception_text_template)
+
+
+class UserDoingForbiddenActions(BaseDomainException):
+    _exception_text_template = "Пользователю с id='{id} запрещено это действие"
+
+    def __init__(self, id: uuid.UUID) -> None:
+        self._exception_text_template = self._exception_text_template.format(id=id)
+        super().__init__(detail=self._exception_text_template)

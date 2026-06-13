@@ -35,12 +35,7 @@ class PostRepository:
             .returning(self._model)
         )
 
-        try:
-            result = await session.execute(query)
-            created_post = result.scalar_one()
-            await session.flush()
-            return created_post
-
-        except IntegrityError:
-            await session.rollback()
-            raise EntityAlreadyExistsException()
+        result = await session.execute(query)
+        created_post = result.scalar_one()
+        await session.flush()
+        return created_post
