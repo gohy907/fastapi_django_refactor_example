@@ -36,3 +36,16 @@ class TestCreateCategory:
         )
 
         assert response.status_code == HTTPStatus.CONFLICT
+
+    async def test_create_unauthorized(self, async_client, alice):
+        category_create = CategoryCreate(
+            title="Category Title",
+            description="Category Description",
+            is_published=True,
+            author_id=alice.id,
+        )
+
+        response = await async_client.post(
+            "/categories/create", json=category_create.model_dump(mode="json")
+        )
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
