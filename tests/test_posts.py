@@ -1,3 +1,5 @@
+import uuid
+
 from src.schemas.posts import PostCreate
 from http import HTTPStatus
 
@@ -30,6 +32,38 @@ class TestPostCreate:
             "/posts/create", json=post_create.model_dump(mode="json")
         )
         assert response.status_code == HTTPStatus.CREATED
+
+    async def test_create_nonexistent_author(self, alice_client, alice, alice_category):
+        nonexistent_user_id = uuid.UUID(int=alice.id.int ^ 1)
+        post_create = PostCreate(
+            title="Alice's Post",
+            body="Post Description",
+            datetime_to_publish="2000-01-01T00:00:00Z",
+            category_id=alice_category.id,
+            author_id=nonexistent_user_id,
+        )
+
+        response = await alice_client.post(
+            "/posts/create", json=post_create.model_dump(mode="json")
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+
+    async def test_create_nonexistent_category(
+        self, alice_client, alice, alice_category
+    ):
+        nonexistent_category_id = uuid.UUID(int=alice_category.id.int ^ 1)
+        post_create = PostCreate(
+            title="Alice's Post",
+            body="Post Description",
+            datetime_to_publish="2000-01-01T00:00:00Z",
+            category_id=nonexistent_category_id,
+            author_id=alice.id,
+        )
+
+        response = await alice_client.post(
+            "/posts/create", json=post_create.model_dump(mode="json")
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
 
     # Проверяет, что можно создать пост только от своего имени и нельзя от чьего либо ещё
     async def test_create_another_account(self, bob_client, alice, alice_category):

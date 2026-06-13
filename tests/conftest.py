@@ -177,6 +177,7 @@ async def alice_post(sync_engine, db_url, alice, alice_category):
                 category_id=alice_category.id,
                 author_id=alice.id,
             ),
+            current_user=alice,
         )
     await engine.dispose()
     return post
