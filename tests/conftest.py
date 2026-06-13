@@ -87,7 +87,7 @@ async def alice(sync_engine, db_url):
         use_case = CreateUserUseCase()
         user = await use_case.execute(
             session=session,
-            user_in=UserCreate(login="alice", password="password"),
+            user_create=UserCreate(login="alice", password="password"),
         )
     await engine.dispose()
     return user
@@ -120,7 +120,7 @@ async def bob(sync_engine, db_url):
         use_case = CreateUserUseCase()
         user = await use_case.execute(
             session=session,
-            user_in=UserCreate(login="bob", password="password"),
+            user_create=UserCreate(login="bob", password="password"),
         )
     await engine.dispose()
     return user
@@ -137,7 +137,7 @@ async def bob_client(async_client, bob):
     yield async_client
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(scope="session")
 async def alice_category(db_url, alice):
     engine = create_async_engine(db_url)
     async with async_sessionmaker(
@@ -148,7 +148,7 @@ async def alice_category(db_url, alice):
         use_case = CreateCategoryUseCase()
         category = await use_case.execute(
             session=session,
-            category_in=CategoryCreate(
+            category_create=CategoryCreate(
                 title="Alice's Category",
                 description="Category Description",
                 is_published=True,
@@ -159,7 +159,7 @@ async def alice_category(db_url, alice):
     return category
 
 
-@pytest_asyncio.fixture(loop_scope="session")
+@pytest_asyncio.fixture(scope="session")
 async def alice_post(sync_engine, db_url, alice, alice_category):
     engine = create_async_engine(db_url)
     async with async_sessionmaker(
