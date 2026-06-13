@@ -11,7 +11,11 @@ from src.core.config import settings
 from src.core.db import Base, get_db
 
 from src.domain.users.use_cases.create_user import CreateUserUseCase
+from src.domain.posts.use_cases.create_post import CreatePostUseCase
+from src.domain.categories.use_cases.create_category import CreateCategoryUseCase
 from src.schemas.users import UserCreate, UserUpdate
+from src.schemas.posts import PostCreate
+from src.schemas.categories import CategoryCreate
 
 
 from jose import jwt
@@ -42,7 +46,7 @@ def sync_engine(db_url):
     Base.metadata.drop_all(engine)
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(loop_scope="session")
 async def async_client(db_url, sync_engine):
     engine = create_async_engine(db_url)
 
@@ -89,7 +93,7 @@ async def alice(sync_engine, db_url):
     return user
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(loop_scope="session")
 async def alice_client(async_client, alice):
     token = jwt.encode(
         claims={"sub": alice.login},
@@ -100,7 +104,7 @@ async def alice_client(async_client, alice):
     yield async_client
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="session")
 async def new_alice():
     yield UserUpdate(login="notsoalice", password="password2")
 
@@ -122,7 +126,7 @@ async def bob(sync_engine, db_url):
     return user
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(loop_scope="session")
 async def bob_client(async_client, bob):
     token = jwt.encode(
         claims={"sub": bob.login},
@@ -131,3 +135,48 @@ async def bob_client(async_client, bob):
     )
     async_client.headers["Authorization"] = f"Bearer {token}"
     yield async_client
+
+
+@pytest_asyncio.fixture(loop_scope="session")
+async def alice_category(db_url, alice):
+    engine = create_async_engine(db_url)
+    async with async_sessionmaker(
+        bind=engine,
+        expire_on_commit=False,
+        class_=AsyncSession,
+    )() as session:
+        use_case = CreateCategoryUseCase()
+        category = await use_case.execute(
+            session=session,
+            category_in=CategoryCreate(
+                title="Alice's Category",
+                description="Category Description",
+                is_published=True,
+                author_id=alice.id,
+            ),
+        )
+    await engine.dispose()
+    return category
+
+
+@pytest_asyncio.fixture(loop_scope="session")
+async def alice_post(sync_engine, db_url, alice, alice_category):
+    engine = create_async_engine(db_url)
+    async with async_sessionmaker(
+        bind=engine,
+        expire_on_commit=False,
+        class_=AsyncSession,
+    )() as session:
+        use_case = CreatePostUseCase()
+        post = await use_case.execute(
+            session=session,
+            post_create=PostCreate(
+                title="мой первый пост!!",
+                body="абоба всем дорогие слушатели",
+                datetime_to_publish="02.03.2006:08:09:07Z",
+                category_id=alice_category.id,
+                author_id=alice.id,
+            ),
+        )
+    await engine.dispose()
+    return post
