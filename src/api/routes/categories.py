@@ -16,6 +16,7 @@ from src.domain.categories.use_cases.get_category import (
 from src.core.exceptions.domain_exceptions import (
     CategoryAlreadyExistsException,
     CategoryNotFoundByIdException,
+    UserNotFoundByIdException,
 )
 
 from src.services.auth import AuthService
@@ -58,5 +59,9 @@ async def create_category(
     except CategoryAlreadyExistsException as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=exc.get_detail()
+        )
+    except UserNotFoundByIdException as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=exc.get_detail()
         )
     return user

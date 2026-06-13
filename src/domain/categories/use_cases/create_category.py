@@ -1,11 +1,18 @@
-from fastapi import HTTPException, status
 from src.repositories.categories import CategoryRepository
+from src.repositories.users import UserRepository
+
 from src.schemas.categories import CategoryResponse, CategoryCreate
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.exceptions.database_exceptions import EntityAlreadyExistsException
-from src.core.exceptions.domain_exceptions import CategoryAlreadyExistsException
+from src.core.exceptions.database_exceptions import (
+    EntityAlreadyExistsException,
+    EntityNotFoundException,
+)
+from src.core.exceptions.domain_exceptions import (
+    CategoryAlreadyExistsException,
+    UserNotFoundByIdException,
+)
 
 import logging
 
@@ -19,9 +26,15 @@ class CreateCategoryUseCase:
     async def execute(
         self, session: AsyncSession, category_in: CategoryCreate
     ) -> CategoryResponse:
-        repo = CategoryRepository(session)
+        user_repo = UserRepository(session)
         try:
-            category = await repo.create(category_in)
+            await user_repo.get_by_id(category_in.author_id)
+        except EntityNotFoundException:
+            raise UserNotFoundByIdException(id=category_in.author_id)
+
+        category_repo = CategoryRepository(session)
+        try:
+            category = await category_repo.create(category_in)
 
         except EntityAlreadyExistsException:
             logger.info(
