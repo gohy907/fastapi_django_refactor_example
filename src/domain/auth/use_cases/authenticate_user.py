@@ -3,8 +3,11 @@ import logging
 from src.repositories.users import UserRepository
 from src.schemas.users import UserResponse as UserSchema
 from src.resources.auth import verify_password
-from src.core.exceptions.database_exceptions import UserNotFoundException
-from src.core.exceptions.domain_exceptions import UserNotFoundByLoginException, WrongPasswordException
+from src.core.exceptions.domain_exceptions import (
+    UserNotFoundByLoginException,
+    WrongPasswordException,
+)
+from src.core.exceptions.database_exceptions import EntityNotFoundException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
@@ -23,13 +26,14 @@ class AuthenticateUserUseCase:
         repo = UserRepository()
         try:
             user = await repo.get_by_login(session=session, login=login)
-        except UserNotFoundException:
-            error = UserNotFoundByLoginException(
-                login=login)
+        except EntityNotFoundException:
+            error = UserNotFoundByLoginException(login=login)
             logger.error(error.get_detail())
             raise error
 
-        if not verify_password(plain_password=password, hashed_password=user.password_hash):
+        if not verify_password(
+            plain_password=password, hashed_password=user.password_hash
+        ):
             error = WrongPasswordException()
             logger.error(error.get_detail())
             raise error

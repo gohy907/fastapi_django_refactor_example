@@ -4,11 +4,8 @@ from src.schemas.categories import CategoryResponse, CategoryCreate
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
-from src.domain.categories.use_cases.get_category import GetCategoryByTitleUseCase
-
-from src.core.exceptions.exc import CategoryAlreadyExistsError
-from src.core.exceptions.database_exceptions import CategoryAlreadyExistsException
+from src.core.exceptions.database_exceptions import EntityAlreadyExistsException
+from src.core.exceptions.domain_exceptions import CategoryAlreadyExistsException
 
 import logging
 
@@ -27,11 +24,11 @@ class CreateCategoryUseCase:
         try:
             category = await repo.create(category_data)
 
-        except CategoryAlreadyExistsError:
+        except EntityAlreadyExistsException:
             logger.info(
                 f"Category {category_in.title} already exists, aborting creation"
             )
-            raise CategoryAlreadyExistsException()
+            raise CategoryAlreadyExistsException(title=category_in.title)
         await session.commit()
 
         return CategoryResponse.model_validate(category)

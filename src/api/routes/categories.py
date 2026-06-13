@@ -13,7 +13,7 @@ from src.domain.categories.use_cases.get_category import (
     GetCategoryByIdUseCase,
 )
 
-from src.core.exceptions.database_exceptions import CategoryAlreadyExistsException
+from src.core.exceptions.domain_exceptions import CategoryAlreadyExistsException
 
 from src.services.auth import AuthService
 from src.schemas.users import UserResponse

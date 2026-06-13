@@ -3,7 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
 from src.models.posts import Post as PostModel
-from src.core.exceptions.database_exceptions import PostNotFoundException, PostAlreadyExistsException
+from src.core.exceptions.database_exceptions import (
+    EntityAlreadyExistsException,
+    EntityNotFoundException,
+)
 
 from typing import Type
 
@@ -17,13 +20,11 @@ class PostRepository:
         self._model: Type[PostModel] = PostModel
 
     async def get_by_id(self, session: AsyncSession, id: uuid.UUID) -> PostModel:
-        query = (
-            select(self._model).where(self._model.id == id)
-        )
+        query = select(self._model).where(self._model.id == id)
         result = await session.execute(query)
         post = result.scalar_one_or_none()
         if not post:
-            raise PostNotFoundException()
+            raise EntityNotFoundException()
         return post
 
     async def create(self, session: AsyncSession, post_create: PostCreate) -> PostModel:
@@ -42,4 +43,4 @@ class PostRepository:
 
         except IntegrityError:
             await session.rollback()
-            raise PostAlreadyExistsException()
+            raise EntityAlreadyExistsException()

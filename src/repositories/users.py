@@ -4,7 +4,10 @@ from sqlalchemy.exc import IntegrityError
 from src.schemas.users import UserCreate, UserInternal, UserResponse
 
 from src.models.users import User as UserModel
-from src.core.exceptions.database_exceptions import UserNotFoundException, UserAlreadyExistsException
+from src.core.exceptions.database_exceptions import (
+    EntityAlreadyExistsException,
+    EntityNotFoundException,
+)
 from src.repositories.base import BaseRepository
 
 from typing import Type
@@ -18,30 +21,26 @@ class UserRepository:
         self._model: Type[UserModel] = UserModel
 
     async def get_by_login(self, session: AsyncSession, login: str) -> UserModel:
-        query = (
-            select(self._model)
-            .where(self._model.login == login)
-        )
+        query = select(self._model).where(self._model.login == login)
 
         result = await session.execute(query)
         user = result.scalar_one_or_none()
         if not user:
-            raise UserNotFoundException()
+            raise EntityNotFoundException()
 
         return user
 
     async def get_by_id(self, session: AsyncSession, id: uuid.UUID) -> UserModel:
-        query = (
-            select(self._model)
-            .where(self._model.id == id)
-        )
+        query = select(self._model).where(self._model.id == id)
         result = await session.execute(query)
         user = result.scalar_one_or_none()
         if not user:
-            raise UserNotFoundException()
+            raise EntityNotFoundException()
         return user
 
-    async def create(self, session: AsyncSession, user_create: UserInternal) -> UserModel:
+    async def create(
+        self, session: AsyncSession, user_create: UserInternal
+    ) -> UserModel:
 
         query = (
             insert(self._model)
@@ -57,9 +56,11 @@ class UserRepository:
 
         except IntegrityError:
             await session.rollback()
-            raise UserAlreadyExistsException()
+            raise EntityAlreadyExistsException()
 
-    async def update(self, session: AsyncSession, id: uuid.UUID, user_update: UserInternal) -> UserModel:
+    async def update(
+        self, session: AsyncSession, id: uuid.UUID, user_update: UserInternal
+    ) -> UserModel:
 
         query = (
             update(self._model)
@@ -74,7 +75,7 @@ class UserRepository:
 
             await session.flush()
             if not updated_user:
-                raise UserNotFoundException()
+                raise EntityNotFoundException()
             return updated_user
         except IntegrityError:
-            raise UserAlreadyExistsException()
+            raise EntityAlreadyExistsException()

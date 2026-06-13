@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import DeclarativeBase
 
 from src.core.config import settings
-from src.core.exceptions.exc import DatabaseError, BaseException
+from src.core.exceptions.database_exceptions import DatabaseError, BaseDatabaseException
 from fastapi.exceptions import RequestValidationError
 
 import logging
@@ -36,13 +36,17 @@ class PostgresDatabase:
             try:
                 yield session
                 await session.commit()
-            except (HTTPException, RequestValidationError, BaseException, IntegrityError):
+            except (
+                HTTPException,
+                RequestValidationError,
+                BaseDatabaseException,
+                IntegrityError,
+            ):
                 await session.rollback()
                 raise
             except Exception as error:
                 await session.rollback()
-                logger.critical(f"Database connection failed: {
-                                error}", exc_info=True)
+                logger.critical(f"Database connection failed: {error}", exc_info=True)
                 raise DatabaseError(message=repr(error))
             finally:
                 await session.close()

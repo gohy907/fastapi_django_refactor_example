@@ -4,7 +4,7 @@ import uuid
 from src.core.db import database
 from src.repositories.users import UserRepository
 from src.schemas.users import UserResponse
-from src.core.exceptions.database_exceptions import UserNotFoundException
+from src.core.exceptions.database_exceptions import EntityNotFoundException
 from src.core.exceptions.domain_exceptions import UserNotFoundByLoginException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,14 +16,17 @@ class GetUserByLoginUseCase:
         self._database = database
         self._repo = UserRepository()
 
-    async def execute(self, session: AsyncSession, login: str, current_user: UserResponse) -> UserResponse:
+    async def execute(
+        self, session: AsyncSession, login: str, current_user: UserResponse
+    ) -> UserResponse:
         try:
             user = await self._repo.get_by_login(session=session, login=login)
-        except UserNotFoundException:
+        except EntityNotFoundException:
             error = UserNotFoundByLoginException(login=login)
             logger.error(
                 f"Пользователь {current_user.login} довел приложение до ошибки: {
-                    error.get_detail()}"
+                    error.get_detail()
+                }"
             )
             raise error
 

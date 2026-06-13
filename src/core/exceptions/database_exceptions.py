@@ -6,25 +6,13 @@ class BaseDatabaseException(Exception):
         return self._detail or "An error occurred"
 
 
-class UserNotFoundException(BaseDatabaseException):
+class EntityNotFoundException(BaseDatabaseException):
     pass
 
 
-class CategoryNotFoundException(BaseDatabaseException):
+class EntityAlreadyExistsException(BaseDatabaseException):
     pass
 
 
-class PostNotFoundException(BaseDatabaseException):
-    pass
-
-
-class UserAlreadyExistsException(BaseDatabaseException):
-    pass
-
-
-class CategoryAlreadyExistsException(BaseDatabaseException):
-    pass
-
-
-class PostAlreadyExistsException(BaseDatabaseException):
+class DatabaseError(BaseDatabaseException):
     pass

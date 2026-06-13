@@ -1,3 +1,6 @@
+import uuid
+
+
 class BaseDomainException(Exception):
     def __init__(self, detail: str) -> None:
         self._detail = detail
@@ -11,7 +14,8 @@ class UserNotFoundByLoginException(BaseDomainException):
 
     def __init__(self, login: str) -> None:
         self._exception_text_template = self._exception_text_template.format(
-            login=login)
+            login=login
+        )
 
         super().__init__(detail=self._exception_text_template)
 
@@ -19,19 +23,19 @@ class UserNotFoundByLoginException(BaseDomainException):
 class UserNotFoundByIdException(BaseDomainException):
     _exception_text_template = "Пользователь с id='{id}' не найден"
 
-    def __init__(self, id: id) -> None:
-        self._exception_text_template = self._exception_text_template.format(
-            id=id)
+    def __init__(self, id: uuid.UUID) -> None:
+        self._exception_text_template = self._exception_text_template.format(id=id)
 
         super().__init__(detail=self._exception_text_template)
 
 
-class UserLoginIsNotUniqueException(BaseDomainException):
+class UserAlreadyExistsException(BaseDomainException):
     _exception_text_template = "Пользователь с логином='{login}' уже существует"
 
     def __init__(self, login: str) -> None:
         self._exception_text_template = self._exception_text_template.format(
-            login=login)
+            login=login
+        )
 
         super().__init__(detail=self._exception_text_template)
 
@@ -48,3 +52,41 @@ class UserUpdatingWithoutAuth(BaseDomainException):
 
     def __init__(self) -> None:
         super().__init__(detail=self._exception_text)
+
+
+class CategoryAlreadyExistsException(BaseDomainException):
+    _exception_text_template = "Категория с названием='{title}' уже существует"
+
+    def __init__(self, title: str) -> None:
+        self._exception_text_template = self._exception_text_template.format(
+            title=title
+        )
+        super().__init__(detail=self._exception_text_template)
+
+
+class CategoryNotFoundByIdException(BaseDomainException):
+    _exception_text_template = "Категория с id='{id}' не найдена"
+
+    def __init__(self, id: uuid.UUID) -> None:
+        self._exception_text_template = self._exception_text_template.format(id=id)
+        super().__init__(detail=self._exception_text_template)
+
+
+class CategoryNotFoundByTitleException(BaseDomainException):
+    _exception_text_template = "Категория с названием='{title}' не найдена"
+
+    def __init__(self, title: str) -> None:
+        self._exception_text_template = self._exception_text_template.format(
+            title=title
+        )
+        super().__init__(detail=self._exception_text_template)
+
+
+class DatabaseError(BaseDomainException):
+    _exception_text_template = "Database error: {message}"
+
+    def __init__(self, message: str) -> None:
+        self._exception_text_template = self._exception_text_template.format(
+            message=message
+        )
+        super().__init__(detail=self._exception_text_template)

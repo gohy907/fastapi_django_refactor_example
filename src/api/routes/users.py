@@ -19,10 +19,10 @@ from src.api.routes.depends import (
 
 from src.domain.users.use_cases.get_user_by_login import GetUserByLoginUseCase
 from src.core.exceptions.domain_exceptions import (
+    UserAlreadyExistsException,
     UserNotFoundByLoginException,
-    UserLoginIsNotUniqueException,
-    UserUpdatingWithoutAuth,
     UserNotFoundByIdException,
+    UserUpdatingWithoutAuth,
 )
 from src.services.auth import AuthService
 
@@ -72,7 +72,7 @@ async def create_user(
     try:
         user = await use_case.execute(user_in=user, session=session)
         return user
-    except UserLoginIsNotUniqueException as exc:
+    except UserAlreadyExistsException as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=exc.get_detail()
         )
@@ -93,7 +93,7 @@ async def update_user(
             id=id, current_user=current_user, user_update=user, session=session
         )
         return user
-    except UserLoginIsNotUniqueException as exc:
+    except UserAlreadyExistsException as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=exc.get_detail()
         )
