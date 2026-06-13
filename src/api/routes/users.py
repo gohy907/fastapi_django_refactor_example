@@ -22,7 +22,7 @@ from src.core.exceptions.domain_exceptions import (
     UserAlreadyExistsException,
     UserNotFoundByLoginException,
     UserNotFoundByIdException,
-    UserUpdatingWithoutAuth,
+    UserDoingForbiddenActions,
 )
 from src.services.auth import AuthService
 
@@ -97,7 +97,7 @@ async def update_user(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=exc.get_detail()
         )
-    except UserUpdatingWithoutAuth as exc:
+    except UserDoingForbiddenActions as exc:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail=exc.get_detail()
         )

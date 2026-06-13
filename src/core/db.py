@@ -47,7 +47,7 @@ class PostgresDatabase:
             except Exception as error:
                 await session.rollback()
                 logger.critical(f"Database connection failed: {error}", exc_info=True)
-                raise DatabaseError(message=repr(error))
+                raise DatabaseError(detail=repr(error))
             finally:
                 await session.close()
 

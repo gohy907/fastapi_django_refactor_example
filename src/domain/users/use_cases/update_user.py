@@ -6,7 +6,7 @@ from src.schemas.users import UserUpdate, UserResponse
 from src.core.exceptions.database_exceptions import EntityAlreadyExistsException
 from src.core.exceptions.domain_exceptions import (
     UserAlreadyExistsException,
-    UserUpdatingWithoutAuth,
+    UserDoingForbiddenActions,
 )
 from src.domain.users.use_cases.get_user_by_id import GetUserByIdUseCase
 
@@ -28,7 +28,7 @@ class UpdateUserUseCase:
     ) -> UserResponse:
 
         if current_user.id != id:
-            error = UserUpdatingWithoutAuth()
+            error = UserDoingForbiddenActions(id=current_user.id)
 
             logger.error(
                 f"Пользователь с id {
