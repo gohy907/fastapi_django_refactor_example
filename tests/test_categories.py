@@ -53,10 +53,17 @@ class TestCreateCategory:
         assert response.status_code == HTTPStatus.UNAUTHORIZED
 
 
-class TestGetCategory:
+class TestGetByIdCategory:
     async def test_get_by_id(self, alice_client, alice_category):
         response = await alice_client.get(f"/categories/{alice_category.id}")
         assert response.status_code == HTTPStatus.OK
+
+        data = response.json()
+        assert data["id"] == str(alice_category.id)
+        assert data["title"] == alice_category.title
+        assert data["description"] == alice_category.description
+        assert data["author_id"] == str(alice_category.author_id)
+        assert "created_at" in data
 
     async def test_get_by_id_nonexistent(self, alice_client, alice_category):
         nonexistent_id = uuid.UUID(int=alice_category.id.int ^ 1)
@@ -66,3 +73,39 @@ class TestGetCategory:
     async def test_get_by_id_unauthorized(self, async_client, alice_category):
         response = await async_client.get(f"/categories/{alice_category.id}")
         assert response.status_code == HTTPStatus.OK
+
+        data = response.json()
+        assert data["id"] == str(alice_category.id)
+        assert data["title"] == alice_category.title
+        assert data["description"] == alice_category.description
+        assert data["author_id"] == str(alice_category.author_id)
+        assert "created_at" in data
+
+
+class TestGetByTitleCategory:
+    async def test_get_by_title(self, alice_client, alice_category):
+        response = await alice_client.get(f"/categories/title/{alice_category.title}")
+        assert response.status_code == HTTPStatus.OK
+
+        data = response.json()
+        assert data["id"] == str(alice_category.id)
+        assert data["title"] == alice_category.title
+        assert data["description"] == alice_category.description
+        assert data["author_id"] == str(alice_category.author_id)
+        assert "created_at" in data
+
+    async def test_get_by_title_nonexistent(self, alice_client, alice_category):
+        nonexistent_title = alice_category.title + "aboba"
+        response = await alice_client.get(f"/categories/title/{nonexistent_title}")
+        assert response.status_code == HTTPStatus.NOT_FOUND
+
+    async def test_get_by_title_unauthorized(self, async_client, alice_category):
+        response = await async_client.get(f"/categories/title/{alice_category.title}")
+        assert response.status_code == HTTPStatus.OK
+
+        data = response.json()
+        assert data["id"] == str(alice_category.id)
+        assert data["title"] == alice_category.title
+        assert data["description"] == alice_category.description
+        assert data["author_id"] == str(alice_category.author_id)
+        assert "created_at" in data
