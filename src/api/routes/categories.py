@@ -15,6 +15,9 @@ from src.domain.categories.use_cases.get_category import (
 
 from src.core.exceptions.database_exceptions import CategoryAlreadyExistsException
 
+from src.services.auth import AuthService
+from src.schemas.users import UserResponse
+
 router = APIRouter()
 
 
@@ -29,11 +32,14 @@ async def get_category_by_id(
 
 
 @router.post(
-    "/create", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED
+    "/create",
+    response_model=CategoryResponse,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_category(
     category_in: CategoryCreate,
     session: AsyncSession = Depends(get_db),
+    user: UserResponse = Depends(AuthService.get_current_user),
     use_case: CreateCategoryUseCase = Depends(create_category_use_case),
 ) -> CategoryResponse:
     try:
